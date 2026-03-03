@@ -2,68 +2,44 @@
 // Инвариант №4: вызывается только из gameReducer, не из компонентов.
 // Инвариант №7: выполняется менее чем за 50 мс на любом валидном состоянии.
 // ADR-002: детерминированный алгоритм — при одинаковом состоянии всегда один результат.
+// FR-03: при нескольких равнозначных ходах выбирается первый по индексу.
+// FR-05: оценки фиксированы: +10 (победа ИИ), -10 (победа противника), 0 (ничья).
 
 import type { BoardState, Player } from '../types';
-import { checkWinner, getAvailableMoves, applyMove, isBoardFull } from './gameLogic';
-import { getOpponent } from './gameLogic';
+import { checkWinner, isBoardFull, getAvailableMoves, applyMove, getOpponent } from './gameLogic';
 
 /**
- * Оценочная функция для minimax с учётом глубины.
- * Более быстрая победа получает более высокую оценку:
- *   победа ИИ:       +10 - depth (чем быстрее, тем лучше)
- *   победа противника: -10 + depth (чем быстрее поражение, тем хуже)
- *   нет победителя:  0
- *
- * Учёт глубины гарантирует, что алгоритм предпочитает немедленные победы
- * отложенным и блокирует немедленные угрозы противника.
- *
- * @param board - Состояние доски
- * @param aiSymbol - Символ ИИ
- * @param depth - Текущая глубина рекурсии
- * @returns Оценка позиции
- */
-function evaluate(board: BoardState, aiSymbol: Player, depth: number): number {
-  const result = checkWinner(board);
-  if (result === null) {
-    return 0;
-  }
-  return result.winner === aiSymbol ? 10 - depth : -10 + depth;
-}
-
-/**
- * Рекурсивная функция minimax с учётом глубины.
- * Полный перебор без alpha-beta pruning — допустимо для поля 3×3.
+ * Рекурсивная функция minimax (полный перебор без alpha-beta pruning).
+ * Оценки фиксированы без учёта глубины (FR-05, ответ на вопрос Q2).
  *
  * @param board - Текущее состояние доски
- * @param isMaximizing - true, если ход ИИ (максимизирующий игрок)
- * @param aiSymbol - Символ ИИ
- * @param depth - Текущая глубина рекурсии (для оценки скорости победы)
- * @returns Оценка позиции
+ * @param aiSymbol - Символ ИИ ('X' или 'O')
+ * @param currentPlayer - Игрок, чей ход сейчас
+ * @param isMaximizing - true, если ход максимизирующего игрока (ИИ)
+ * @returns Оценка позиции: +10 (победа ИИ), -10 (победа противника), 0 (ничья)
  */
-function minimax(
+export function minimax(
   board: BoardState,
-  isMaximizing: boolean,
   aiSymbol: Player,
-  depth: number,
+  currentPlayer: Player,
+  isMaximizing: boolean,
 ): number {
-  const score = evaluate(board, aiSymbol, depth);
-
-  // Терминальные состояния: победа или ничья
-  if (score !== 0) {
-    return score;
+  const winResult = checkWinner(board);
+  if (winResult !== null) {
+    return winResult.winner === aiSymbol ? 10 : -10;
   }
   if (isBoardFull(board)) {
     return 0;
   }
 
-  const currentPlayer: Player = isMaximizing ? aiSymbol : getOpponent(aiSymbol);
   const moves = getAvailableMoves(board);
+  const nextPlayer = getOpponent(currentPlayer);
 
   if (isMaximizing) {
     let best = -Infinity;
     for (const move of moves) {
       const nextBoard = applyMove(board, move, currentPlayer);
-      const value = minimax(nextBoard, false, aiSymbol, depth + 1);
+      const value = minimax(nextBoard, aiSymbol, nextPlayer, false);
       if (value > best) {
         best = value;
       }
@@ -73,7 +49,7 @@ function minimax(
     let best = Infinity;
     for (const move of moves) {
       const nextBoard = applyMove(board, move, currentPlayer);
-      const value = minimax(nextBoard, true, aiSymbol, depth + 1);
+      const value = minimax(nextBoard, aiSymbol, nextPlayer, true);
       if (value < best) {
         best = value;
       }
@@ -85,31 +61,40 @@ function minimax(
 /**
  * Возвращает индекс оптимального хода для ИИ на основе minimax.
  *
- * Граничные случаи:
+ * Граничные случаи (FR-10 проверяется раньше FR-04):
+ * - Если на доске уже есть победитель — выбрасывает Error('Game is already over').
  * - Если доска полностью заполнена — выбрасывает Error('No available moves').
- *   Вызывающий код (gameReducer) обязан проверить isBoardFull перед вызовом.
- * - Если победитель уже определён — поведение не определено;
- *   вызывающий код обязан проверить статус игры перед вызовом.
+ *
+ * Детерминированность (FR-03): при нескольких равнозначных ходах
+ * выбирается первый по индексу (итерация по getAvailableMoves, который
+ * возвращает индексы в порядке возрастания).
  *
  * @param board - Текущее состояние доски
  * @param aiPlayer - Символ ИИ ('X' или 'O')
  * @returns Индекс клетки [0..8]
  */
 export function getBestMove(board: BoardState, aiPlayer: Player): number {
-  const moves = getAvailableMoves(board);
+  // FR-10: проверка победителя выполняется до проверки заполненности
+  const winResult = checkWinner(board);
+  if (winResult !== null) {
+    throw new Error('Game is already over');
+  }
 
+  const moves = getAvailableMoves(board);
   if (moves.length === 0) {
     throw new Error('No available moves');
   }
 
   let bestScore = -Infinity;
-  // Гарантированно не undefined: moves.length > 0 проверено выше
+  // moves.length > 0 гарантировано проверкой выше
   let bestMove = moves[0] as number;
 
   for (const move of moves) {
     const nextBoard = applyMove(board, move, aiPlayer);
-    // depth=1: первый ход уже сделан, передаём глубину для оценки скорости победы
-    const score = minimax(nextBoard, false, aiPlayer, 1);
+    const opponent = getOpponent(aiPlayer);
+    const score = minimax(nextBoard, aiPlayer, opponent, false);
+    // FR-03: строгое сравнение (>) гарантирует выбор первого по индексу
+    // при равных оценках, так как moves отсортированы по возрастанию
     if (score > bestScore) {
       bestScore = score;
       bestMove = move;
