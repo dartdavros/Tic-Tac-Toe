@@ -1,0 +1,49 @@
+{
+  "checklist": [
+    {
+      "id": "planned_files",
+      "label": "Files from plan exist",
+      "passed": true,
+      "detail": "35/35 files found"
+    },
+    {
+      "id": "test_files_exist",
+      "label": "Test files present",
+      "passed": true,
+      "detail": "4 test file(s) found"
+    },
+    {
+      "id": "spec_exists",
+      "label": "Specification filled",
+      "passed": true,
+      "detail": "5179 chars"
+    },
+    {
+      "id": "stages_complete",
+      "label": "All stages implemented",
+      "passed": true,
+      "detail": "2/2 stages"
+    }
+  ],
+  "task_commands": [
+    {
+      "name": "Lint tests",
+      "command": "npm run lint",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "\n> tic-tac-toe@1.0.0 lint\n> eslint .\n\n",
+      "stderr": ""
+    },
+    {
+      "name": "Vitest",
+      "command": "npm run test",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "\n> tic-tac-toe@1.0.0 test\n> vitest run\n\n\n\u001b[1m\u001b[7m\u001b[36m RUN \u001b[39m\u001b[27m\u001b[22m \u001b[36mv2.1.8 \u001b[39m\u001b[90mC:/Users/drmar/MyProjects/Skaro/test-projects/Tic-Tac-Toe\u001b[39m\n\n \u001b[32m✓\u001b[39m src/logic/gameLogic.test.ts \u001b[2m(\u001b[22m\u001b[2m33 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/logic/gameReducer.test.ts \u001b[2m(\u001b[22m\u001b[2m19 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 36\u001b[2mms\u001b[22m\u001b[39m\n \u001b[31m❯\u001b[39m src/logic/aiPlayer.test.ts \u001b[2m(\u001b[22m\u001b[2m10 tests\u001b[22m\u001b[2m | \u001b[22m\u001b[31m2 failed\u001b[39m\u001b[2m)\u001b[22m\u001b[90m 229\u001b[2mms\u001b[22m\u001b[39m\n\u001b[31m   \u001b[31m×\u001b[31m getBestMove\u001b[2m > \u001b[22mвыполняется менее чем за 50 мс на пустой доске (худший случай)\u001b[90m 132\u001b[2mms\u001b[22m\u001b[31m\u001b[39m\n\u001b[31m     → expected 124.54650000000015 to be less than 50\u001b[39m\n\u001b[31m   \u001b[31m×\u001b[31m getBestMove\u001b[2m > \u001b[22mвыбирает центр на пустой доске (оптимальная стратегия)\u001b[90m 89\u001b[2mms\u001b[22m\u001b[31m\u001b[39m\n\u001b[31m     → expected +0 to be 4 // Object.is equality\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[31m1 failed\u001b[39m\u001b[22m\u001b[2m | \u001b[22m\u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (3)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[31m2 failed\u001b[39m\u001b[22m\u001b[2m | \u001b[22m\u001b[1m\u001b[32m60 passed\u001b[39m\u001b[22m\u001b[90m (62)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:56:39\n\u001b[2m   Duration \u001b[22m 2.33s\u001b[2m (transform 154ms, setup 938ms, collect 319ms, tests 273ms, environment 3.74s, prepare 439ms)\u001b[22m\n\n",
+      "stderr": "\u001b[90mstderr\u001b[2m | src/logic/gameReducer.test.ts\u001b[2m > \u001b[22m\u001b[2mgameReducer — MAKE_MOVE (PvP)\u001b[2m > \u001b[22m\u001b[2mигнорирует ход в занятую клетку\n\u001b[22m\u001b[39m[logEvent] invalid_move { reason: \u001b[32m'cell_occupied'\u001b[39m, index: \u001b[33m0\u001b[39m }\n\n\u001b[90mstderr\u001b[2m | src/logic/gameReducer.test.ts\u001b[2m > \u001b[22m\u001b[2mgameReducer — MAKE_MOVE (PvP)\u001b[2m > \u001b[22m\u001b[2mигнорирует ход с невалидным индексом (< 0)\n\u001b[22m\u001b[39m[logEvent] invalid_move { reason: \u001b[32m'invalid_index'\u001b[39m, index: \u001b[33m-1\u001b[39m }\n\n\u001b[90mstderr\u001b[2m | src/logic/gameReducer.test.ts\u001b[2m > \u001b[22m\u001b[2mgameReducer — MAKE_MOVE (PvP)\u001b[2m > \u001b[22m\u001b[2mигнорирует ход с невалидным индексом (> 8)\n\u001b[22m\u001b[39m[logEvent] invalid_move { reason: \u001b[32m'invalid_index'\u001b[39m, index: \u001b[33m9\u001b[39m }\n\n\u001b[90mstderr\u001b[2m | src/logic/gameReducer.test.ts\u001b[2m > \u001b[22m\u001b[2mgameReducer — MAKE_MOVE (PvP)\u001b[2m > \u001b[22m\u001b[2mигнорирует ход когда экран не game\n\u001b[22m\u001b[39m[logEvent] invalid_move {\n  reason: \u001b[32m'not_game_screen'\u001b[39m,\n  action: { type: \u001b[32m'MAKE_MOVE'\u001b[39m, payload: { index: \u001b[33m0\u001b[39m } }\n}\n\n\u001b[90mstderr\u001b[2m | src/logic/gameReducer.test.ts\u001b[2m > \u001b[22m\u001b[2mgameReducer — MAKE_MOVE (PvP)\u001b[2m > \u001b[22m\u001b[2mигнорирует ход когда партия завершена\n\u001b[22m\u001b[39m[logEvent] invalid_move {\n  reason: \u001b[32m'not_game_screen'\u001b[39m,\n  action: { type: \u001b[32m'MAKE_MOVE'\u001b[39m, payload: { index: \u001b[33m5\u001b[39m } }\n}\n\n\u001b[90mstderr\u001b[2m | src/logic/gameReducer.test.ts\u001b[2m > \u001b[22m\u001b[2mgameReducer — защитное поведение\u001b[2m > \u001b[22m\u001b[2mинвариант: переход menu → result напрямую невозможен\n\u001b[22m\u001b[39m[logEvent] invalid_move {\n  reason: \u001b[32m'not_game_screen'\u001b[39m,\n  action: { type: \u001b[32m'MAKE_MOVE'\u001b[39m, payload: { index: \u001b[33m0\u001b[39m } }\n}\n\n\u001b[90mstderr\u001b[2m | src/logic/gameReducer.test.ts\u001b[2m > \u001b[22m\u001b[2mgameReducer — защитное поведение\u001b[2m > \u001b[22m\u001b[2mвозвращает текущее состояние при неизвестном действии\n\u001b[22m\u001b[39m[logEvent] invalid_move { action: { type: \u001b[32m'UNKNOWN_ACTION'\u001b[39m } }\n\n\u001b[31m⎯⎯⎯⎯⎯⎯⎯\u001b[1m\u001b[7m Failed Tests 2 \u001b[27m\u001b[22m⎯⎯⎯⎯⎯⎯⎯\u001b[39m\n\n\u001b[31m\u001b[1m\u001b[7m FAIL \u001b[27m\u001b[22m\u001b[39m src/logic/aiPlayer.test.ts\u001b[2m > \u001b[22mgetBestMove\u001b[2m > \u001b[22mвыполняется менее чем за 50 мс на пустой доске (худший случай)\n\u001b[31m\u001b[1mAssertionError\u001b[22m: expected 124.54650000000015 to be less than 50\u001b[39m\n\u001b[36m \u001b[2m❯\u001b[22m src/logic/aiPlayer.test.ts:\u001b[2m20:39\u001b[22m\u001b[39m\n    \u001b[90m 18| \u001b[39m    \u001b[35mconst\u001b[39m start \u001b[33m=\u001b[39m performance\u001b[33m.\u001b[39m\u001b[34mnow\u001b[39m()\u001b[33m;\u001b[39m\n    \u001b[90m 19| \u001b[39m    \u001b[34mgetBestMove\u001b[39m(\u001b[33mEMPTY\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'X'\u001b[39m)\u001b[33m;\u001b[39m\n    \u001b[90m 20| \u001b[39m    \u001b[34mexpect\u001b[39m(performance\u001b[33m.\u001b[39m\u001b[34mnow\u001b[39m() \u001b[33m-\u001b[39m start)\u001b[33m.\u001b[39m\u001b[34mtoBeLessThan\u001b[39m(\u001b[34m50\u001b[39m)\u001b[33m;\u001b[39m\n    \u001b[90m   | \u001b[39m                                      \u001b[31m^\u001b[39m\n    \u001b[90m 21| \u001b[39m  })\u001b[33m;\u001b[39m\n    \u001b[90m 22| \u001b[39m\n\n\u001b[31m\u001b[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯\u001b[22m\u001b[39m\n\n\u001b[31m\u001b[1m\u001b[7m FAIL \u001b[27m\u001b[22m\u001b[39m src/logic/aiPlayer.test.ts\u001b[2m > \u001b[22mgetBestMove\u001b[2m > \u001b[22mвыбирает центр на пустой доске (оптимальная стратегия)\n\u001b[31m\u001b[1mAssertionError\u001b[22m: expected +0 to be 4 // Object.is equality\u001b[39m\n\n\u001b[32m- Expected\u001b[39m\n\u001b[31m+ Received\u001b[39m\n\n\u001b[32m- 4\u001b[39m\n\u001b[31m+ 0\u001b[39m\n\n\u001b[36m \u001b[2m❯\u001b[22m src/logic/aiPlayer.test.ts:\u001b[2m49:18\u001b[22m\u001b[39m\n    \u001b[90m 47| \u001b[39m    \u001b[90m// Центр (индекс 4) — оптимальный первый ход для minimax\u001b[39m\n    \u001b[90m 48| \u001b[39m    \u001b[35mconst\u001b[39m move \u001b[33m=\u001b[39m \u001b[34mgetBestMove\u001b[39m(\u001b[33mEMPTY\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'X'\u001b[39m)\u001b[33m;\u001b[39m\n    \u001b[90m 49| \u001b[39m    \u001b[34mexpect\u001b[39m(move)\u001b[33m.\u001b[39m\u001b[34mtoBe\u001b[39m(\u001b[34m4\u001b[39m)\u001b[33m;\u001b[39m\n    \u001b[90m   | \u001b[39m                 \u001b[31m^\u001b[39m\n    \u001b[90m 50| \u001b[39m  })\u001b[33m;\u001b[39m\n    \u001b[90m 51| \u001b[39m\n\n\u001b[31m\u001b[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯\u001b[22m\u001b[39m\n\n"
+    }
+  ],
+  "global_commands": [],
+  "passed": false,
+  "timestamp": "2026-03-01T15:56:42.252514"
+}

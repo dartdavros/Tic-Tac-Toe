@@ -1,0 +1,5 @@
+- name: Lint tests
+  command: npm run lint
+
+- name: Vitest
+  command: npm run test
