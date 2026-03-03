@@ -1,0 +1,7 @@
+- command: npx vitest run src/components/GameSettings.test.tsx
+  name: Smoke-тесты компонента GameSettings
+- command: npx tsc --noEmit
+  name: Проверка типов TypeScript
+- command: npx eslint src/components/GameSettings.tsx src/components/GameSettings.test.tsx
+    src/components/GameSettings.module.css --max-warnings=0
+  name: Линтинг изменённых файлов

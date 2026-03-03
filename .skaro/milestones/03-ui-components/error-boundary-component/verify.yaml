@@ -1,0 +1,12 @@
+- command: npx eslint src/components/ErrorBoundary/ src/components/App.tsx src/types/index.ts
+    src/logic/gameReducer.ts --max-warnings=0
+  name: Линтинг изменённых файлов
+- command: npx tsc --noEmit
+  name: Проверка типов TypeScript
+- command: npm run build
+  name: Сборка проекта
+- command: npx vitest run src/logic/gameReducer.test.ts
+  name: Запуск существующих тестов редьюсера (не должны сломаться после добавления
+    RESET_GAME)
+- command: npx vitest run --coverage
+  name: Запуск всех тестов с покрытием
