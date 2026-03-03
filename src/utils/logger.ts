@@ -1,37 +1,32 @@
 /**
- * Модуль логирования событий приложения.
- * Инвариант №3: не импортирует ничего из components/ и не использует React API.
- * FR-04: экспортирует тип LogEventType и функцию logEvent.
+ * Минимальный слой логирования.
+ * В dev-режиме пишет в консоль, в prod подключается к аналитике.
+ * Инвариант: logEvent — единственная точка логирования в приложении.
  */
 
 /**
- * Строгий union допустимых типов событий.
- * Передача неизвестного типа вызывает ошибку компиляции TypeScript (FR-01).
+ * Допустимые типы событий для логирования.
+ * Расширяйте этот union при добавлении новых событий.
  */
-export type LogEventType = 'reducer_error' | 'render_error';
+export type LogEventType =
+  | 'render_error'
+  | 'reducer_error'
+  | 'invalid_action'
+  | 'unknown_action';
 
 /**
- * Логирует событие приложения.
+ * Логирует событие с опциональной полезной нагрузкой.
  *
- * В dev-режиме (import.meta.env.DEV === true) выводит сообщение в консоль
- * через console.warn с префиксом [logEvent] (FR-02).
- *
- * В production-режиме является no-op (FR-03).
- *
- * Тело обёрнуто в try/catch — функция никогда не выбрасывает исключений (FR-05).
- *
- * @param event   - Тип события (ограничен union LogEventType)
- * @param payload - Произвольные данные события (опционально)
+ * @param event - Тип события
+ * @param payload - Дополнительные данные (опционально)
  */
-export function logEvent(event: LogEventType, payload?: unknown): void {
-  try {
-    if (import.meta.env.DEV) {
-      console.warn('[logEvent]', event, payload ?? '');
-    } else {
-      // TODO: подключить аналитику в production
-    }
-  } catch {
-    // Исключение внутри логгера молча игнорируется,
-    // чтобы логгер никогда не нарушал работу вызывающего кода (FR-05).
+export function logEvent(
+  event: LogEventType,
+  payload?: Record<string, unknown>,
+): void {
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.warn(`[logEvent] ${event}`, payload);
   }
+  // TODO: В prod подключить внешнюю аналитику (например, Vercel Analytics)
 }

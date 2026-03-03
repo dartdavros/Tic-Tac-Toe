@@ -29,7 +29,7 @@ export function Board({ board, onCellClick, winLine, disabled }: BoardProps) {
         <div key={rowIndex} role="row" className={styles.row}>
           {rowIndices.map((cellIndex) => {
             const isWinCell = winLine?.includes(cellIndex) ?? false;
-            // FR-04: клетка заблокирована если disabled=true ИЛИ клетка занята
+            // Клетка заблокирована если disabled=true ИЛИ клетка занята
             const isCellDisabled = disabled === true || board[cellIndex] !== null;
 
             return (
@@ -42,7 +42,7 @@ export function Board({ board, onCellClick, winLine, disabled }: BoardProps) {
                 <Cell
                   value={board[cellIndex]}
                   index={cellIndex}
-                  onClick={() => onCellClick(cellIndex)}
+                  onCellClick={() => onCellClick(cellIndex)}
                   isWinCell={isWinCell}
                   disabled={isCellDisabled}
                 />

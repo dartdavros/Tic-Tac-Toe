@@ -1,31 +1,27 @@
-// Редьюсер игрового состояния — единственная точка мутации (инвариант №1).
-// Инвариант №6: редьюсер не выбрасывает исключений при любых входных данных.
-// ADR-007: защитный try/catch перехватывает все непредвиденные ошибки.
-// ADR-003: синхронный вызов ИИ внутри редьюсера гарантирует атомарность.
+// Редьюсер игрового состояния.
+// ADR-001: единственная точка мутации GameState.
+// ADR-007: защитный редьюсер с try/catch — при исключении возвращает текущее состояние.
+// ADR-003: синхронный вызов ИИ внутри редьюсера (инвариант №4).
 
-import type {
-  GameState,
-  GameAction,
-  GameSettings,
-  GameStatus,
-  BoardState,
-} from '../types';
+import type { GameState, GameAction, BoardState, GameStatus, GameSettings } from '../types';
 import {
+  applyMove,
   checkWinner,
   isBoardFull,
-  applyMove,
+  getAvailableMoves,
 } from './gameLogic';
 import { getBestMove } from './aiPlayer';
 import { logEvent } from '../utils/logger';
 
-// FR-02: Пустая доска — кортеж фиксированной длины 9 (инвариант №12).
+/**
+ * Пустая доска — экспортируется для использования в тестах.
+ */
 export const EMPTY_BOARD: BoardState = [
   null, null, null,
   null, null, null,
   null, null, null,
 ];
 
-// FR-01: Начальное состояние приложения.
 export const INITIAL_STATE: GameState = {
   screen: 'menu',
   board: EMPTY_BOARD,
@@ -34,219 +30,223 @@ export const INITIAL_STATE: GameState = {
 };
 
 /**
- * FR-12: Определяет, является ли текущий ход ходом ИИ.
+ * Определяет, является ли текущий ход ходом ИИ.
+ * Экспортируется для использования в тестах.
  *
- * Возвращает true только если:
- * - режим pvai
- * - статус 'playing'
- * - текущий игрок не совпадает с humanPlayer (т.е. сейчас ходит ИИ)
- *
- * @param status   - Текущий статус игры
+ * @param status - Текущий статус игры
  * @param settings - Настройки игры
- * @returns true, если сейчас ход ИИ
+ * @returns true, если сейчас должен ходить ИИ
  */
 export function isAiTurn(status: GameStatus, settings: GameSettings): boolean {
-  if (settings.mode !== 'pvai') {
-    return false;
-  }
-  if (status.kind !== 'playing') {
-    return false;
-  }
+  if (settings.mode !== 'pvai') return false;
+  if (status.kind !== 'playing') return false;
   return status.currentPlayer !== settings.humanPlayer;
 }
 
 /**
- * Применяет ход ИИ к доске и возвращает новое состояние.
- * Вспомогательная функция для устранения дублирования между START_GAME и MAKE_MOVE.
- *
- * Все ошибки (исключения от getBestMove, невалидный индекс) перехватываются
- * внутри этой функции. При ошибке вызывается logEvent и возвращается
- * stateAfterHuman без изменений (ход ИИ пропускается).
- *
- * Это гарантирует, что catch редьюсера вызывается только при действительно
- * непредвиденных ошибках вне applyAiMove (например, в applyMove хода игрока).
- *
- * @param stateAfterHuman - Состояние после хода человека (или начальное при START_GAME)
- * @param action          - Исходное действие (для логирования ошибок)
- * @returns Новое состояние с применённым ходом ИИ (или то же состояние при ошибке)
+ * Вычисляет статус игры после хода.
+ * Возвращает новый GameStatus на основе текущей доски и следующего игрока.
  */
-function applyAiMove(
-  stateAfterHuman: GameState,
-  action: GameAction,
-): GameState {
-  const { board, settings } = stateAfterHuman;
-
-  // Защита: не вызываем getBestMove на полной доске
-  if (isBoardFull(board)) {
-    return stateAfterHuman;
-  }
-
-  // settings.mode === 'pvai' гарантирован вызывающим кодом
-  if (settings.mode !== 'pvai') {
-    return stateAfterHuman;
-  }
-
-  const aiSymbol = settings.humanPlayer === 'X' ? 'O' : 'X';
-
-  let aiMoveIndex: number;
-
-  try {
-    // getBestMove может выбросить исключение (например, при некорректном состоянии).
-    // Перехватываем здесь, чтобы ход игрока не откатывался через catch редьюсера.
-    aiMoveIndex = getBestMove(board, aiSymbol);
-  } catch (error) {
-    // FR-06 / FR-09: логируем ошибку и возвращаем состояние без хода ИИ.
-    logEvent('reducer_error', { action, error });
-    return stateAfterHuman;
-  }
-
-  // FR-06 / FR-03: если getBestMove вернул null или -1 — логируем и пропускаем ход ИИ.
-  if (aiMoveIndex == null || aiMoveIndex === -1) {
-    logEvent('reducer_error', {
-      action,
-      error: new Error(
-        `getBestMove вернул недопустимое значение: ${String(aiMoveIndex)}`,
-      ),
-    });
-    return stateAfterHuman;
-  }
-
-  const boardAfterAi = applyMove(board, aiMoveIndex, aiSymbol);
-
-  // FR-05 / FR-03: проверяем победителя после хода ИИ (для единообразия)
-  const statusAfterAi = checkWinner(boardAfterAi, aiSymbol);
-
-  const isGameOver =
-    statusAfterAi.kind === 'won' || statusAfterAi.kind === 'draw';
-
-  return {
-    ...stateAfterHuman,
-    board: boardAfterAi,
-    status: statusAfterAi,
-    screen: isGameOver ? 'result' : 'game',
-  };
+function computeStatus(board: BoardState, nextPlayer: 'X' | 'O'): GameStatus {
+  return checkWinner(board, nextPlayer);
 }
 
 /**
- * Обрабатывает действие START_GAME.
- * FR-03: сбрасывает доску, устанавливает настройки, переводит screen: 'game'.
- * Если режим pvai и ИИ ходит первым (humanPlayer === 'O') — применяет ход ИИ.
+ * Применяет ход ИИ к доске и возвращает новое состояние.
+ * При ошибке логирует и возвращает состояние до хода ИИ (с ходом игрока уже применённым).
+ *
+ * Инвариант №4: ИИ вызывается только из редьюсера.
+ * Инвариант №6: не выбрасывает исключения.
  */
-function handleStartGame(
-  action: Extract<GameAction, { type: 'START_GAME' }>,
+function applyAiMove(
+  stateBeforeAi: GameState,
+  aiSymbol: 'X' | 'O',
+  humanPlayer: 'X' | 'O',
 ): GameState {
-  const { payload: settings } = action;
-
-  const freshState: GameState = {
-    screen: 'game',
-    board: EMPTY_BOARD,
-    status: { kind: 'playing', currentPlayer: 'X' },
-    settings,
-  };
-
-  // FR-03: если pvai и ИИ ходит первым (X всегда начинает, humanPlayer === 'O')
-  if (settings.mode === 'pvai' && settings.humanPlayer === 'O') {
-    return applyAiMove(freshState, action);
+  // Проверяем, есть ли ходы для ИИ
+  if (isBoardFull(stateBeforeAi.board) || getAvailableMoves(stateBeforeAi.board).length === 0) {
+    return {
+      ...stateBeforeAi,
+      screen: 'result',
+    };
   }
 
-  return freshState;
+  try {
+    const aiMoveIndex = getBestMove(stateBeforeAi.board, aiSymbol);
+
+    // Валидация возвращённого индекса
+    if (
+      typeof aiMoveIndex !== 'number' ||
+      aiMoveIndex < 0 ||
+      aiMoveIndex > 8 ||
+      stateBeforeAi.board[aiMoveIndex] !== null
+    ) {
+      throw new Error(`Некорректный ход ИИ: индекс ${aiMoveIndex}`);
+    }
+
+    const boardAfterAi = applyMove(stateBeforeAi.board, aiMoveIndex, aiSymbol);
+    const statusAfterAi = computeStatus(boardAfterAi, humanPlayer);
+
+    if (statusAfterAi.kind !== 'playing') {
+      return {
+        ...stateBeforeAi,
+        board: boardAfterAi,
+        status: statusAfterAi,
+        screen: 'result',
+      };
+    }
+
+    return {
+      ...stateBeforeAi,
+      board: boardAfterAi,
+      status: statusAfterAi,
+    };
+  } catch (error) {
+    // При ошибке ИИ логируем и возвращаем состояние с ходом игрока (без хода ИИ)
+    logEvent('reducer_error', { error });
+    return stateBeforeAi;
+  }
 }
 
 /**
  * Обрабатывает действие MAKE_MOVE.
- * FR-04: валидирует ход перед применением.
- * FR-05: проверяет победителя после хода игрока.
- * FR-06: в режиме pvai синхронно применяет ход ИИ (атомарная транзакция).
+ * Инвариант №5: переход на экран result происходит только здесь.
+ * Инвариант №4: ИИ вызывается только из редьюсера.
  */
 function handleMakeMove(
   state: GameState,
-  action: Extract<GameAction, { type: 'MAKE_MOVE' }>,
+  index: number,
 ): GameState {
-  const { index } = action.payload;
-
-  // FR-04: валидация — экран должен быть 'game'
+  // Валидация: только на экране game
   if (state.screen !== 'game') {
     return state;
   }
 
-  // FR-04: валидация — партия должна продолжаться
+  // Валидация: партия должна быть в процессе
   if (state.status.kind !== 'playing') {
     return state;
   }
 
-  // FR-04: валидация — индекс в допустимом диапазоне
+  // Валидация: индекс клетки
   if (index < 0 || index > 8) {
     return state;
   }
 
-  // FR-04: валидация — клетка должна быть свободна
+  // Валидация: клетка не занята
   if (state.board[index] !== null) {
     return state;
   }
 
   const currentPlayer = state.status.currentPlayer;
   const boardAfterPlayer = applyMove(state.board, index, currentPlayer);
+  const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  const statusAfterPlayer = computeStatus(boardAfterPlayer, nextPlayer);
 
-  // FR-05: проверяем победителя после хода игрока
-  const statusAfterPlayer = checkWinner(boardAfterPlayer, currentPlayer);
-  const isGameOverAfterPlayer =
-    statusAfterPlayer.kind === 'won' || statusAfterPlayer.kind === 'draw';
+  // Партия завершена после хода игрока
+  if (statusAfterPlayer.kind !== 'playing') {
+    return {
+      ...state,
+      board: boardAfterPlayer,
+      status: statusAfterPlayer,
+      screen: 'result',
+    };
+  }
+
+  // Режим PvP — просто передаём ход
+  if (state.settings.mode === 'pvp') {
+    return {
+      ...state,
+      board: boardAfterPlayer,
+      status: statusAfterPlayer,
+    };
+  }
+
+  // Режим PvAI — вычисляем ход ИИ синхронно
+  const humanPlayer = state.settings.humanPlayer;
+  const aiSymbol = humanPlayer === 'X' ? 'O' : 'X';
 
   const stateAfterPlayer: GameState = {
     ...state,
     board: boardAfterPlayer,
     status: statusAfterPlayer,
-    screen: isGameOverAfterPlayer ? 'result' : 'game',
   };
 
-  // FR-11: переход в result происходит только внутри редьюсера (инвариант №5)
-  if (isGameOverAfterPlayer) {
-    return stateAfterPlayer;
+  return applyAiMove(stateAfterPlayer, aiSymbol, humanPlayer);
+}
+
+/**
+ * Обрабатывает действие START_GAME.
+ * Если режим PvAI и человек играет за O — ИИ делает первый ход.
+ */
+function handleStartGame(
+  action: Extract<GameAction, { type: 'START_GAME' }>,
+): GameState {
+  const baseState: GameState = {
+    screen: 'game',
+    board: EMPTY_BOARD,
+    status: { kind: 'playing', currentPlayer: 'X' },
+    settings: action.payload,
+  };
+
+  // Если PvAI и человек = O, то ИИ (X) ходит первым
+  if (action.payload.mode === 'pvai' && action.payload.humanPlayer === 'O') {
+    return applyAiMove(baseState, 'X', 'O');
   }
 
-  // FR-06: если режим pvai и сейчас ход ИИ — применяем ход ИИ атомарно
-  if (isAiTurn(statusAfterPlayer, state.settings)) {
-    return applyAiMove(stateAfterPlayer, action);
-  }
-
-  return stateAfterPlayer;
+  return baseState;
 }
 
 /**
  * Редьюсер игрового состояния.
- *
+ * Инвариант №6: не выбрасывает исключения — все ошибки перехватываются try/catch.
  * Инвариант №1: единственная точка мутации GameState.
- * Инвариант №6: никогда не выбрасывает исключений.
- * ADR-008: защитный try/catch — при исключении возвращает текущее состояние.
- * FR-09: logEvent вызывается ТОЛЬКО в блоке catch (здесь и в applyAiMove).
- *
- * @param state  - Текущее состояние
- * @param action - Действие
- * @returns Новое состояние (или текущее при невалидном/неожиданном действии)
  */
 export function gameReducer(state: GameState, action: GameAction): GameState {
   try {
     switch (action.type) {
-      case 'START_GAME':
+      case 'START_GAME': {
         return handleStartGame(action);
+      }
 
-      case 'MAKE_MOVE':
-        return handleMakeMove(state, action);
+      case 'MAKE_MOVE': {
+        return handleMakeMove(state, action.payload.index);
+      }
 
-      // FR-07: RESTART возвращает полное начальное состояние
-      case 'RESTART':
-        return INITIAL_STATE;
+      case 'RESTART': {
+        // Перезапуск с теми же настройками — работает с любого экрана game или result
+        const firstPlayer = 'X';
+        const baseState: GameState = {
+          ...state,
+          screen: 'game',
+          board: EMPTY_BOARD,
+          status: { kind: 'playing', currentPlayer: firstPlayer },
+        };
 
-      // FR-08: QUIT_TO_MENU возвращает полное начальное состояние
-      case 'QUIT_TO_MENU':
-        return INITIAL_STATE;
+        // Если PvAI и человек = O, ИИ делает первый ход
+        if (state.settings.mode === 'pvai' && state.settings.humanPlayer === 'O') {
+          return applyAiMove(baseState, 'X', 'O');
+        }
 
-      default:
-        // Неизвестное действие — возвращаем текущее состояние без изменений
+        return baseState;
+      }
+
+      case 'QUIT_TO_MENU': {
+        return { ...INITIAL_STATE };
+      }
+
+      case 'RESET_GAME': {
+        // Полный сброс в начальное состояние (используется ErrorBoundary)
+        return { ...INITIAL_STATE };
+      }
+
+      default: {
+        // Защита от неизвестных действий на уровне типов
+        const _exhaustive: never = action;
+        logEvent('unknown_action', { action: _exhaustive });
         return state;
+      }
     }
   } catch (error) {
-    // FR-09: логируем с полным объектом action (ответ на Question 6)
     logEvent('reducer_error', { action, error });
     return state;
   }

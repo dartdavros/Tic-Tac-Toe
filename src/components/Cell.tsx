@@ -10,11 +10,11 @@ export interface CellProps {
   index: number;
   onCellClick: (index: number) => void;
   disabled?: boolean;
+  isWinCell?: boolean;
 }
 
 /**
  * Вычисляет человекочитаемое описание значения клетки для aria-label.
- * FR-04: 'пусто' | 'крестик' | 'нолик'
  */
 function getCellValueLabel(value: CellValue): string {
   if (value === 'X') return 'крестик';
@@ -23,8 +23,7 @@ function getCellValueLabel(value: CellValue): string {
 }
 
 /**
- * Вычисляет CSS-класс значения клетки согласно FR-11.
- * Базовый класс cell присутствует всегда — добавляется снаружи.
+ * Вычисляет CSS-класс значения клетки.
  */
 function getValueClassName(value: CellValue): string {
   if (value === 'X') return styles.cellX;
@@ -35,25 +34,22 @@ function getValueClassName(value: CellValue): string {
 /**
  * Компонент отдельной клетки игрового поля.
  *
- * Корневой элемент — нативный <button> (FR-03), что обеспечивает:
+ * Корневой элемент — нативный <button>, что обеспечивает:
  * - поддержку клавиатурной навигации (Enter, Space) без onKeyDown;
  * - нативную блокировку кликов при disabled={true} на уровне браузера.
  *
- * Не хранит локального состояния (NFR-01).
+ * Не хранит локального состояния.
  * Инвариант ADR-010: aria-label, aria-disabled для скринридеров.
  */
-export function Cell({ value, index, onCellClick, disabled = false }: CellProps) {
-  // FR-04: row и col вычисляются из index (0-based → 1-based)
+export function Cell({ value, index, onCellClick, disabled = false, isWinCell: _isWinCell }: CellProps) {
+  // row и col вычисляются из index (0-based → 1-based)
   const row = Math.floor(index / 3) + 1;
   const col = (index % 3) + 1;
   const ariaLabel = `Клетка ${row}×${col}, ${getCellValueLabel(value)}`;
 
-  // FR-11: базовый класс cell присутствует всегда + класс значения
+  // Базовый класс cell присутствует всегда + класс значения
   const className = `${styles.cell} ${getValueClassName(value)}`;
 
-  // FR-05: onClick вызывает onCellClick(index)
-  // FR-06: при disabled нативная кнопка блокирует клик на уровне браузера,
-  //        onCellClick не вызывается без дополнительной проверки
   function handleClick() {
     if (!disabled) {
       onCellClick(index);
