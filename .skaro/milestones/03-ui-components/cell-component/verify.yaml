@@ -1,0 +1,6 @@
+- command: npx vitest run src/components/Cell.test.tsx --reporter=verbose
+  name: Smoke-тесты компонента Cell
+- command: npx tsc --noEmit
+  name: TypeScript — проверка типов
+- command: npx eslint src/components/Cell.tsx src/components/Cell.test.tsx src/styles/Cell.module.css
+  name: Lint изменённых файлов

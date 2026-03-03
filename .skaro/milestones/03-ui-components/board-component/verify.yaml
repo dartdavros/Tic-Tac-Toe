@@ -1,0 +1,9 @@
+- command: npx vitest run src/components/Board.test.tsx --reporter=verbose
+  name: Smoke-тесты компонента Board
+- command: npx eslint src/components/Board.tsx src/components/Board.test.tsx src/styles/Board.module.css
+    --max-warnings=0
+  name: Линтинг изменённых файлов
+- command: npx tsc --noEmit --project tsconfig.app.json
+  name: Проверка типов TypeScript
+- command: npx vitest run --reporter=verbose
+  name: Полный прогон тестов (регрессия)

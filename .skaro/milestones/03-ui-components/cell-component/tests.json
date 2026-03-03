@@ -1,0 +1,56 @@
+{
+  "checklist": [
+    {
+      "id": "planned_files",
+      "label": "Files from plan exist",
+      "passed": false,
+      "detail": "8/9 files found. Missing: vitest.config"
+    },
+    {
+      "id": "test_files_exist",
+      "label": "Test files present",
+      "passed": true,
+      "detail": "6 test file(s) found"
+    },
+    {
+      "id": "spec_exists",
+      "label": "Specification filled",
+      "passed": true,
+      "detail": "5571 chars"
+    },
+    {
+      "id": "stages_complete",
+      "label": "All stages implemented",
+      "passed": true,
+      "detail": "1/1 stages"
+    }
+  ],
+  "task_commands": [
+    {
+      "name": "Smoke-тесты компонента Cell",
+      "command": "npx vitest run src/components/Cell.test.tsx --reporter=verbose",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "\n\u001b[1m\u001b[7m\u001b[36m RUN \u001b[39m\u001b[27m\u001b[22m \u001b[36mv2.1.8 \u001b[39m\u001b[90mC:/Users/drmar/MyProjects/test-projects/Tic-Tac-Toe\u001b[39m\n\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — рендеринг\u001b[2m > \u001b[22mрендерится без ошибок при value=null\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — рендеринг\u001b[2m > \u001b[22mрендерится без ошибок при value=\"X\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — рендеринг\u001b[2m > \u001b[22mрендерится без ошибок при value=\"O\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — рендеринг\u001b[2m > \u001b[22mкорневым элементом является нативный <button>\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — рендеринг\u001b[2m > \u001b[22mдоступен через getByRole(\"button\") — нативная кнопка имеет role по умолчанию\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — рендеринг\u001b[2m > \u001b[22mотображает \"X\" при value=\"X\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — рендеринг\u001b[2m > \u001b[22mотображает \"O\" при value=\"O\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-label\u001b[2m > \u001b[22maria-label содержит \"пусто\" при value=null (индекс 0 → клетка 1×1)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-label\u001b[2m > \u001b[22maria-label содержит \"крестик\" при value=\"X\" (индекс 0 → клетка 1×1)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-label\u001b[2m > \u001b[22maria-label содержит \"нолик\" при value=\"O\" (индекс 0 → клетка 1×1)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-label\u001b[2m > \u001b[22maria-label корректно вычисляет row и col для индекса 4 (центр → 2×2)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-label\u001b[2m > \u001b[22maria-label корректно вычисляет row и col для индекса 8 (правый нижний → 3×3)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-label\u001b[2m > \u001b[22maria-label корректно вычисляет row и col для индекса 5 (2×3)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-disabled\u001b[2m > \u001b[22maria-disabled=\"false\" при disabled не передан\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-disabled\u001b[2m > \u001b[22maria-disabled=\"false\" при disabled={false}\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — aria-disabled\u001b[2m > \u001b[22maria-disabled=\"true\" при disabled={true}\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — нативный атрибут disabled\u001b[2m > \u001b[22mкнопка не имеет атрибута disabled при disabled не передан\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — нативный атрибут disabled\u001b[2m > \u001b[22mкнопка имеет нативный атрибут disabled при disabled={true}\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — обработка кликов\u001b[2m > \u001b[22mклик вызывает onCellClick с корректным index\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — обработка кликов\u001b[2m > \u001b[22mклик вызывает onCellClick с index=0\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — обработка кликов\u001b[2m > \u001b[22mпри disabled={true} клик не вызывает onCellClick\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — клавиатурная навигация (нативное поведение <button>)\u001b[2m > \u001b[22mнажатие Enter вызывает onCellClick (нативное поведение кнопки)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — клавиатурная навигация (нативное поведение <button>)\u001b[2m > \u001b[22mнажатие Space вызывает onCellClick (нативное поведение кнопки)\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mбазовый класс \"cell\" присутствует всегда при value=null\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mбазовый класс \"cell\" присутствует всегда при value=\"X\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mбазовый класс \"cell\" присутствует всегда при value=\"O\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mкласс \"cellX\" присутствует при value=\"X\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mклассы \"cellO\" и \"cellEmpty\" отсутствуют при value=\"X\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mкласс \"cellO\" присутствует при value=\"O\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mклассы \"cellX\" и \"cellEmpty\" отсутствуют при value=\"O\"\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mкласс \"cellEmpty\" присутствует при value=null\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — CSS-классы\u001b[2m > \u001b[22mклассы \"cellX\" и \"cellO\" отсутствуют при value=null\n \u001b[32m✓\u001b[39m src/components/Cell.test.tsx\u001b[2m > \u001b[22mCell — экспорт CellProps\u001b[2m > \u001b[22mCellProps экспортируется как именованный экспорт из Cell.tsx\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m33 passed\u001b[39m\u001b[22m\u001b[90m (33)\u001b[39m\n\u001b[2m   Start at \u001b[22m 20:07:21\n\u001b[2m   Duration \u001b[22m 1.75s\u001b[2m (transform 96ms, setup 127ms, collect 301ms, tests 291ms, environment 633ms, prepare 116ms)\u001b[22m\n\n",
+      "stderr": ""
+    },
+    {
+      "name": "TypeScript — проверка типов",
+      "command": "npx tsc --noEmit",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "Lint изменённых файлов",
+      "command": "npx eslint src/components/Cell.tsx src/components/Cell.test.tsx src/styles/Cell.module.css",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "\nC:\\Users\\drmar\\MyProjects\\test-projects\\Tic-Tac-Toe\\src\\styles\\Cell.module.css\n  0:0  warning  File ignored because no matching configuration was supplied\n\n✖ 1 problem (0 errors, 1 warning)\n\n",
+      "stderr": ""
+    }
+  ],
+  "passed": false,
+  "timestamp": "2026-03-03T20:07:26.354188"
+}

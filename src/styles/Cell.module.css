@@ -1,1 +1,64 @@
-/* Стили Cell (в папке styles) — будут добавлены в соответствующей задаче */
+/*
+ * Стили компонента Cell.
+ * ADR-004: только CSS Modules, без inline-стилей и хардкода значений.
+ * Все цвета и размеры — через CSS-переменные из global.css (:root).
+ */
+
+/* Базовый класс клетки — присутствует всегда (FR-11) */
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--cell-size-desktop);
+  height: var(--cell-size-desktop);
+
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+
+  font-family: var(--font-family);
+  font-size: var(--font-size-large);
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cell:hover:not(:disabled) {
+  background-color: var(--color-bg);
+}
+
+.cell:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cell:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Класс для клетки с X (FR-11) */
+.cellX {
+  color: var(--color-player-x);
+}
+
+/* Класс для клетки с O (FR-11) */
+.cellO {
+  color: var(--color-player-o);
+}
+
+/* Класс для пустой клетки (FR-11) */
+.cellEmpty {
+  color: transparent;
+}
+
+/* Адаптивная вёрстка: мобильные устройства (FR-08) */
+@media (max-width: 480px) {
+  .cell {
+    width: var(--cell-size-mobile);
+    height: var(--cell-size-mobile);
+    font-size: var(--font-size-base);
+  }
+}

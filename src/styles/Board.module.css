@@ -1,1 +1,45 @@
-/* Стили Board (в папке styles) — будут добавлены в соответствующей задаче */
+/*
+ * Стили компонента Board.
+ * ADR-004: CSS Modules — единственный подход к стилизации.
+ * FR-03: визуальное разделение клеток через gap, не через border на Cell.
+ * Все токены — CSS-переменные из global.css (инвариант №15).
+ */
+
+.board {
+  display: inline-grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.row {
+  display: contents;
+}
+
+/*
+ * Контейнер поля использует вложенный grid для трёх строк.
+ * Три строки по три клетки — итого 9 ячеек в сетке 3×3.
+ */
+.board {
+  display: inline-grid;
+  grid-template-columns: repeat(3, var(--cell-size-desktop));
+  grid-template-rows: repeat(3, var(--cell-size-desktop));
+  gap: 8px;
+}
+
+/*
+ * Победная клетка: фон через CSS-переменную --color-win-highlight.
+ * FR-05, FR-07: переменная объявлена в global.css.
+ */
+.winCell {
+  background-color: var(--color-win-highlight);
+  border-radius: 4px;
+}
+
+/* Адаптивная вёрстка: мобильные устройства (NFR-02) */
+@media (max-width: 480px) {
+  .board {
+    grid-template-columns: repeat(3, var(--cell-size-mobile));
+    grid-template-rows: repeat(3, var(--cell-size-mobile));
+    gap: 6px;
+  }
+}
