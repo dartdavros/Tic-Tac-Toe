@@ -1,0 +1,6 @@
+- command: npx vitest run src/logic/gameReducer.test.ts --reporter=verbose
+  name: Запуск тестов gameReducer
+- command: npx tsc --noEmit --project tsconfig.app.json
+  name: Проверка типов TypeScript
+- command: npx eslint src/logic/gameReducer.ts src/logic/gameReducer.test.ts
+  name: Линтинг gameReducer
