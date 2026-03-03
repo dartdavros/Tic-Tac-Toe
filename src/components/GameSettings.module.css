@@ -1,1 +1,112 @@
-/* Стили компонента GameSettings — будут добавлены в соответствующей задаче */
+/*
+ * Стили компонента GameSettings.
+ * ADR-004: только CSS Modules, только переменные из global.css.
+ * Инвариант №15: хардкод цветов, размеров и шрифтов запрещён.
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background-color: var(--color-bg);
+}
+
+.title {
+  font-family: var(--font-family);
+  font-size: var(--font-size-large);
+  color: var(--color-text-primary);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 360px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 0;
+}
+
+.legend {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  padding: 0 0.5rem;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 0.4rem 0;
+}
+
+.label + .label {
+  margin-top: 0.25rem;
+}
+
+.radio {
+  accent-color: var(--color-accent);
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.submitButton {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-surface);
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.15s ease;
+}
+
+.submitButton:hover {
+  opacity: 0.9;
+}
+
+.submitButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Адаптивная вёрстка: NFR-02 — корректное отображение от 320px */
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+    justify-content: flex-start;
+    padding-top: 2rem;
+  }
+
+  .title {
+    font-size: var(--font-size-base);
+    margin-bottom: 1.25rem;
+  }
+
+  .form {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "checklist": [
+    {
+      "id": "planned_files",
+      "label": "Files from plan exist",
+      "passed": true,
+      "detail": "8/8 files found"
+    },
+    {
+      "id": "test_files_exist",
+      "label": "Test files present",
+      "passed": true,
+      "detail": "7 test file(s) found"
+    },
+    {
+      "id": "spec_exists",
+      "label": "Specification filled",
+      "passed": true,
+      "detail": "4406 chars"
+    },
+    {
+      "id": "stages_complete",
+      "label": "All stages implemented",
+      "passed": true,
+      "detail": "1/1 stages"
+    }
+  ],
+  "task_commands": [
+    {
+      "name": "Smoke-тесты компонента GameSettings",
+      "command": "npx vitest run src/components/GameSettings.test.tsx",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "\n\u001b[1m\u001b[7m\u001b[36m RUN \u001b[39m\u001b[27m\u001b[22m \u001b[36mv2.1.8 \u001b[39m\u001b[90mC:/Users/drmar/MyProjects/test-projects/Tic-Tac-Toe\u001b[39m\n\n \u001b[32m✓\u001b[39m src/components/GameSettings.test.tsx \u001b[2m(\u001b[22m\u001b[2m15 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 700\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m15 passed\u001b[39m\u001b[22m\u001b[90m (15)\u001b[39m\n\u001b[2m   Start at \u001b[22m 20:30:01\n\u001b[2m   Duration \u001b[22m 2.12s\u001b[2m (transform 99ms, setup 129ms, collect 303ms, tests 700ms, environment 599ms, prepare 122ms)\u001b[22m\n\n",
+      "stderr": ""
+    },
+    {
+      "name": "Проверка типов TypeScript",
+      "command": "npx tsc --noEmit",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "Линтинг изменённых файлов",
+      "command": "npx eslint src/components/GameSettings.tsx src/components/GameSettings.test.tsx src/components/GameSettings.module.css --max-warnings=0",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "\nC:\\Users\\drmar\\MyProjects\\test-projects\\Tic-Tac-Toe\\src\\components\\GameSettings.module.css\n  0:0  warning  File ignored because no matching configuration was supplied\n\n✖ 1 problem (0 errors, 1 warning)\n\n",
+      "stderr": "ESLint found too many warnings (maximum: 0).\n"
+    }
+  ],
+  "passed": false,
+  "timestamp": "2026-03-03T20:30:06.504583"
+}
