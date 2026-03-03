@@ -1,19 +1,37 @@
-// Минимальный слой логирования.
-// В dev-режиме пишет в консоль, в prod подключается к аналитике.
-// Инвариант №3: не импортирует ничего из components/, не использует React API.
+/**
+ * Модуль логирования событий приложения.
+ * Инвариант №3: не импортирует ничего из components/ и не использует React API.
+ * FR-04: экспортирует тип LogEventType и функцию logEvent.
+ */
 
 /**
- * Логирует событие с опциональной полезной нагрузкой.
- * В dev-режиме выводит в консоль через console.warn.
- * В prod-режиме — точка расширения для подключения внешней аналитики.
- *
- * @param event - Название события (например, 'invalid_move', 'reducer_error')
- * @param payload - Опциональные данные события для отладки
+ * Строгий union допустимых типов событий.
+ * Передача неизвестного типа вызывает ошибку компиляции TypeScript (FR-01).
  */
-export function logEvent(event: string, payload?: unknown): void {
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.warn(`[logEvent] ${event}`, payload);
+export type LogEventType = 'reducer_error' | 'render_error';
+
+/**
+ * Логирует событие приложения.
+ *
+ * В dev-режиме (import.meta.env.DEV === true) выводит сообщение в консоль
+ * через console.warn с префиксом [logEvent] (FR-02).
+ *
+ * В production-режиме является no-op (FR-03).
+ *
+ * Тело обёрнуто в try/catch — функция никогда не выбрасывает исключений (FR-05).
+ *
+ * @param event   - Тип события (ограничен union LogEventType)
+ * @param payload - Произвольные данные события (опционально)
+ */
+export function logEvent(event: LogEventType, payload?: unknown): void {
+  try {
+    if (import.meta.env.DEV) {
+      console.warn('[logEvent]', event, payload ?? '');
+    } else {
+      // TODO: подключить аналитику в production
+    }
+  } catch {
+    // Исключение внутри логгера молча игнорируется,
+    // чтобы логгер никогда не нарушал работу вызывающего кода (FR-05).
   }
-  // TODO: В prod подключить внешнюю аналитику (например, Vercel Analytics)
 }

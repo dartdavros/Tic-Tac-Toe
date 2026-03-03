@@ -1,0 +1,8 @@
+- command: npx tsc --noEmit --project tsconfig.app.json
+  name: Проверка типов TypeScript
+- command: npx eslint src/utils/logger.ts
+  name: Линтер ESLint для файла логгера
+- command: npx vitest run src/logic/gameReducer.test.ts
+  name: Тесты редьюсера (косвенное покрытие логгера)
+- command: npx vitest run --reporter=verbose
+  name: Все тесты проекта (регрессия)
