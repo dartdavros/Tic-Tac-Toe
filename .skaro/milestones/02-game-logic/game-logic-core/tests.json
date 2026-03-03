@@ -1,0 +1,57 @@
+{
+  "checklist": [
+    {
+      "id": "planned_files",
+      "label": "Files from plan exist",
+      "passed": true,
+      "detail": "10/10 files found"
+    },
+    {
+      "id": "test_files_exist",
+      "label": "Test files present",
+      "passed": true,
+      "detail": "4 test file(s) found"
+    },
+    {
+      "id": "spec_exists",
+      "label": "Specification filled",
+      "passed": true,
+      "detail": "4988 chars"
+    },
+    {
+      "id": "stages_complete",
+      "label": "All stages implemented",
+      "passed": true,
+      "detail": "1/1 stages"
+    }
+  ],
+  "task_commands": [
+    {
+      "name": "Запуск тестов gameLogic с покрытием",
+      "command": "npx vitest run src/logic/gameLogic.test.ts --coverage",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "\n\u001b[1m\u001b[7m\u001b[36m RUN \u001b[39m\u001b[27m\u001b[22m \u001b[36mv2.1.8 \u001b[39m\u001b[90mC:/Users/drmar/MyProjects/test-projects/Tic-Tac-Toe\u001b[39m\n      \u001b[2mCoverage enabled with \u001b[22m\u001b[33mv8\u001b[39m\n\n \u001b[32m✓\u001b[39m src/logic/gameLogic.test.ts \u001b[2m(\u001b[22m\u001b[2m51 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 13\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m51 passed\u001b[39m\u001b[22m\u001b[90m (51)\u001b[39m\n\u001b[2m   Start at \u001b[22m 15:55:11\n\u001b[2m   Duration \u001b[22m 1.50s\u001b[2m (transform 55ms, setup 142ms, collect 78ms, tests 13ms, environment 688ms, prepare 131ms)\u001b[22m\n\n\u001b[34m % \u001b[39m\u001b[2mCoverage report from \u001b[22m\u001b[33mv8\u001b[39m\n----------------|---------|----------|---------|---------|-------------------\nFile            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n----------------|---------|----------|---------|---------|-------------------\nAll files       |   26.31 |    92.59 |      80 |   26.31 |                   \n aiPlayer.ts    |       0 |        0 |       0 |       0 | 1-127             \n gameLogic.ts   |     100 |      100 |     100 |     100 |                   \n gameReducer.ts |       0 |        0 |       0 |       0 | 1-158             \n----------------|---------|----------|---------|---------|-------------------\n",
+      "stderr": "ERROR: Coverage for lines (26.31%) does not meet global threshold (90%)\nERROR: Coverage for functions (80%) does not meet global threshold (90%)\nERROR: Coverage for statements (26.31%) does not meet global threshold (90%)\n"
+    },
+    {
+      "name": "Линтинг gameLogic",
+      "command": "npx eslint src/logic/gameLogic.ts src/logic/gameLogic.test.ts",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "Проверка типов TypeScript",
+      "command": "npx tsc --noEmit",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "global_commands": [],
+  "passed": false,
+  "timestamp": "2026-03-03T15:55:16.480942"
+}

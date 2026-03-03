@@ -2,15 +2,40 @@
 // Инвариант №4: вызывается только из gameReducer, не из компонентов.
 // Инвариант №7: выполняется менее чем за 50 мс на любом валидном состоянии.
 // ADR-002: детерминированный алгоритм — при одинаковом состоянии всегда один результат.
-// FR-03: при нескольких равнозначных ходах выбирается первый по индексу.
-// FR-05: оценки фиксированы: +10 (победа ИИ), -10 (победа противника), 0 (ничья).
 
 import type { BoardState, Player } from '../types';
-import { checkWinner, isBoardFull, getAvailableMoves, applyMove, getOpponent } from './gameLogic';
+import {
+  getAvailableMoves,
+  applyMove,
+  getOpponent,
+  checkWinner,
+} from './gameLogic';
+
+/**
+ * Вычисляет числовую оценку терминального состояния доски.
+ * Возвращает null если состояние не терминальное (игра продолжается).
+ *
+ * @param board - Текущее состояние доски
+ * @param aiSymbol - Символ ИИ
+ * @returns +10 (победа ИИ), -10 (победа противника), 0 (ничья), null (игра продолжается)
+ */
+function evaluateTerminal(board: BoardState, aiSymbol: Player): number | null {
+  // Передаём aiSymbol как currentPlayer — для определения победителя значение не важно,
+  // оно используется только для статуса 'playing', который здесь не нужен.
+  const status = checkWinner(board, aiSymbol);
+
+  if (status.kind === 'won') {
+    return status.winner === aiSymbol ? 10 : -10;
+  }
+  if (status.kind === 'draw') {
+    return 0;
+  }
+  return null;
+}
 
 /**
  * Рекурсивная функция minimax (полный перебор без alpha-beta pruning).
- * Оценки фиксированы без учёта глубины (FR-05, ответ на вопрос Q2).
+ * Оценки фиксированы без учёта глубины: +10, -10, 0.
  *
  * @param board - Текущее состояние доски
  * @param aiSymbol - Символ ИИ ('X' или 'O')
@@ -24,12 +49,10 @@ export function minimax(
   currentPlayer: Player,
   isMaximizing: boolean,
 ): number {
-  const winResult = checkWinner(board);
-  if (winResult !== null) {
-    return winResult.winner === aiSymbol ? 10 : -10;
-  }
-  if (isBoardFull(board)) {
-    return 0;
+  // Проверяем терминальное состояние перед рекурсией
+  const terminalScore = evaluateTerminal(board, aiSymbol);
+  if (terminalScore !== null) {
+    return terminalScore;
   }
 
   const moves = getAvailableMoves(board);
@@ -61,22 +84,21 @@ export function minimax(
 /**
  * Возвращает индекс оптимального хода для ИИ на основе minimax.
  *
- * Граничные случаи (FR-10 проверяется раньше FR-04):
+ * Граничные случаи (проверка победителя выполняется раньше проверки заполненности):
  * - Если на доске уже есть победитель — выбрасывает Error('Game is already over').
  * - Если доска полностью заполнена — выбрасывает Error('No available moves').
  *
- * Детерминированность (FR-03): при нескольких равнозначных ходах
- * выбирается первый по индексу (итерация по getAvailableMoves, который
- * возвращает индексы в порядке возрастания).
+ * Детерминированность: при нескольких равнозначных ходах выбирается первый
+ * по индексу (итерация по getAvailableMoves, возвращающей индексы по возрастанию).
  *
  * @param board - Текущее состояние доски
  * @param aiPlayer - Символ ИИ ('X' или 'O')
  * @returns Индекс клетки [0..8]
  */
 export function getBestMove(board: BoardState, aiPlayer: Player): number {
-  // FR-10: проверка победителя выполняется до проверки заполненности
-  const winResult = checkWinner(board);
-  if (winResult !== null) {
+  // Проверка победителя выполняется до проверки заполненности (контракт)
+  const status = checkWinner(board, aiPlayer);
+  if (status.kind === 'won') {
     throw new Error('Game is already over');
   }
 
@@ -92,9 +114,9 @@ export function getBestMove(board: BoardState, aiPlayer: Player): number {
   for (const move of moves) {
     const nextBoard = applyMove(board, move, aiPlayer);
     const opponent = getOpponent(aiPlayer);
-    const score = minimax(nextBoard, aiPlayer, opponent, false);
-    // FR-03: строгое сравнение (>) гарантирует выбор первого по индексу
+    // Строгое сравнение (>) гарантирует выбор первого по индексу
     // при равных оценках, так как moves отсортированы по возрастанию
+    const score = minimax(nextBoard, aiPlayer, opponent, false);
     if (score > bestScore) {
       bestScore = score;
       bestMove = move;

@@ -11,37 +11,38 @@ const EMPTY_BOARD: BoardState = [null, null, null, null, null, null, null, null,
 // ─── getBestMove ────────────────────────────────────────────────────────────
 
 describe('getBestMove', () => {
-  it('выбрасывает ошибку при полностью заполненной доске (FR-04)', () => {
+  it('выбрасывает ошибку при полностью заполненной доске без победителя', () => {
+    // Ничья — доска полна, победителя нет → 'No available moves'
     const board: BoardState = ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'];
     expect(() => getBestMove(board, 'X')).toThrow('No available moves');
   });
 
-  it('выбрасывает ошибку если на доске уже есть победитель (FR-10)', () => {
+  it('выбрасывает ошибку если на доске уже есть победитель', () => {
     // X победил по первой строке
     const board: BoardState = ['X', 'X', 'X', 'O', 'O', null, null, null, null];
     expect(() => getBestMove(board, 'O')).toThrow('Game is already over');
   });
 
-  it('проверка победителя выполняется раньше проверки заполненности (FR-10)', () => {
-    // Доска заполнена, но есть победитель — должна быть ошибка 'Game is already over'
-    const board: BoardState = ['X', 'X', 'X', 'O', 'O', 'O', 'X', 'O', 'X'];
+  it('проверка победителя выполняется раньше проверки заполненности', () => {
+    // Доска заполнена, но X побеждает по диагонали [0,4,8] — ошибка 'Game is already over'
+    const board: BoardState = ['X', 'O', 'X', 'O', 'X', 'O', 'O', 'O', 'X'];
     expect(() => getBestMove(board, 'O')).toThrow('Game is already over');
   });
 
-  it('выполняется менее чем за 50 мс на пустой доске (худший случай, NFR-01)', () => {
+  it('выполняется менее чем за 50 мс на пустой доске (худший случай)', () => {
     const start = performance.now();
     getBestMove(EMPTY_BOARD, 'X');
     expect(performance.now() - start).toBeLessThan(50);
   });
 
-  it('детерминирован: при одинаковом состоянии всегда возвращает один ход (FR-03)', () => {
+  it('детерминирован: при одинаковом состоянии всегда возвращает один ход', () => {
     const board: BoardState = ['X', null, null, null, 'O', null, null, null, null];
     const move1 = getBestMove(board, 'X');
     const move2 = getBestMove(board, 'X');
     expect(move1).toBe(move2);
   });
 
-  it('выбирает победный ход для ИИ — X побеждает ходом в клетку 2 (FR-02)', () => {
+  it('выбирает победный ход для ИИ — X побеждает ходом в клетку 2', () => {
     // X: 0, 1 → ход в 2 = победа; O: 3, 4 → ход в 5 = блокировка O
     // ИИ должен предпочесть победу блокировке
     const board: BoardState = ['X', 'X', null, 'O', 'O', null, null, null, null];
@@ -89,16 +90,15 @@ describe('getBestMove', () => {
     expect(move).toBe(5);
   });
 
-  it('при нескольких равнозначных ходах выбирает первый по индексу (FR-03)', () => {
-    // На пустой доске все угловые ходы равнозначны после центра,
-    // но центр (4) имеет наивысший счёт и выбирается первым
+  it('при нескольких равнозначных ходах выбирает первый по индексу', () => {
+    // На пустой доске центр (4) — оптимальный ход для любого игрока
     const move = getBestMove(EMPTY_BOARD, 'O');
-    // Центр — оптимальный ход для любого игрока
     expect(move).toBe(4);
   });
 
   it('ИИ за X блокирует O по столбцу', () => {
     // O: 0, 3 → ход в 6 = победа O; X должен заблокировать клетку 6
+    // X стоит на 1 и 4 — нет собственного победного хода по столбцу
     const board: BoardState = ['O', 'X', null, 'O', 'X', null, null, null, null];
     const move = getBestMove(board, 'X');
     expect(move).toBe(6);
@@ -115,7 +115,7 @@ describe('getBestMove', () => {
 // ─── minimax ─────────────────────────────────────────────────────────────────
 
 describe('minimax', () => {
-  it('возвращает +10 при победе ИИ (X) на текущей доске (FR-05)', () => {
+  it('возвращает +10 при победе ИИ (X) на текущей доске', () => {
     // X уже победил — minimax должен вернуть +10
     const board: BoardState = ['X', 'X', 'X', 'O', 'O', null, null, null, null];
     // isMaximizing=false: ход O, но победа уже есть → терминальное состояние
@@ -123,14 +123,14 @@ describe('minimax', () => {
     expect(score).toBe(10);
   });
 
-  it('возвращает -10 при победе противника (O) на текущей доске (FR-05)', () => {
+  it('возвращает -10 при победе противника (O) на текущей доске', () => {
     // O уже победил — minimax для ИИ=X должен вернуть -10
     const board: BoardState = ['O', 'O', 'O', 'X', 'X', null, null, null, null];
     const score = minimax(board, 'X', 'X', true);
     expect(score).toBe(-10);
   });
 
-  it('возвращает 0 при ничьей (FR-05)', () => {
+  it('возвращает 0 при ничьей', () => {
     // Ничья — все клетки заняты, победителя нет
     const board: BoardState = ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'];
     const score = minimax(board, 'X', 'X', true);
@@ -159,7 +159,7 @@ describe('minimax', () => {
     expect(score).toBe(0);
   });
 
-  it('экспортируется как именованный экспорт (FR-08)', () => {
+  it('экспортируется как именованный экспорт', () => {
     // Проверяем, что minimax доступен для прямого импорта
     expect(typeof minimax).toBe('function');
   });

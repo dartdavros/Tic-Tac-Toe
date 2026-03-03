@@ -1,0 +1,32 @@
+{
+  "checklist": [
+    {
+      "id": "planned_files",
+      "label": "Files from plan exist",
+      "passed": true,
+      "detail": "4/4 files found"
+    },
+    {
+      "id": "test_files_exist",
+      "label": "Test files present",
+      "passed": true,
+      "detail": "4 test file(s) found"
+    },
+    {
+      "id": "spec_exists",
+      "label": "Specification filled",
+      "passed": true,
+      "detail": "4682 chars"
+    },
+    {
+      "id": "stages_complete",
+      "label": "All stages implemented",
+      "passed": false,
+      "detail": "1/0 stages"
+    }
+  ],
+  "task_commands": [],
+  "global_commands": [],
+  "passed": false,
+  "timestamp": "2026-03-03T15:00:44.776550"
+}

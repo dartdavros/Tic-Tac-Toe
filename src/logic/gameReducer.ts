@@ -87,7 +87,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           };
         }
 
-        // Если режим PvAI и сейчас не ход ИИ — вычисляем ход ИИ синхронно
+        // Если режим PvAI — вычисляем ход ИИ синхронно (ADR-003)
         if (state.settings.mode === 'pvai') {
           const humanPlayer = state.settings.humanPlayer;
           const aiSymbol = humanPlayer === 'X' ? 'O' : 'X';

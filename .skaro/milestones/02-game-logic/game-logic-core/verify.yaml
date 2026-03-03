@@ -1,0 +1,6 @@
+- name: Запуск тестов gameLogic с покрытием
+  command: npx vitest run src/logic/gameLogic.test.ts --coverage
+- name: Линтинг gameLogic
+  command: npx eslint src/logic/gameLogic.ts src/logic/gameLogic.test.ts
+- name: Проверка типов TypeScript
+  command: npx tsc --noEmit
