@@ -1,0 +1,10 @@
+- command: npx vitest run src/components/App.test.tsx --reporter=verbose
+  name: Smoke-тест App компонента
+- command: npx vitest run --reporter=verbose
+  name: Все тесты проекта (регрессия)
+- command: npx tsc --noEmit
+  name: TypeScript проверка типов
+- command: npx eslint src/components/App.tsx src/main.tsx src/components/App.test.tsx
+  name: Линтер
+- command: npx vite build
+  name: Сборка проекта

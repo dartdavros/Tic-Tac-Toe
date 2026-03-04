@@ -1,1 +1,42 @@
-/* Глобальные стили макета App — будут добавлены в соответствующей задаче */
+/*
+ * Стили корневого компонента App.
+ * ADR-004: только CSS Modules, только переменные из global.css.
+ * Инвариант №15: хардкод цветов, размеров и шрифтов запрещён.
+ */
+
+/* Внешний контейнер: центрирование по горизонтали, ограничение ширины */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: var(--color-bg);
+  font-family: var(--font-family);
+  box-sizing: border-box;
+}
+
+/* Обёртка игрового экрана: вертикальное расположение StatusBar + Board */
+.gameScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Адаптивная вёрстка: уменьшение отступов на мобильных */
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .gameScreen {
+    gap: 1rem;
+  }
+}

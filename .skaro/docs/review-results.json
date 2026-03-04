@@ -28,22 +28,22 @@
       "id": "all_tasks_tests_confirmed",
       "label": "All task tests confirmed",
       "passed": false,
-      "detail": "5/22 tasks"
+      "detail": "12/15 tasks"
     },
     {
       "id": "all_tasks_implemented",
       "label": "All tasks fully implemented",
       "passed": false,
-      "detail": "5/22 tasks"
+      "detail": "12/15 tasks"
     },
     {
       "id": "milestones_have_tasks",
       "label": "All milestones have tasks",
       "passed": true,
-      "detail": "6 milestone(s), all with tasks"
+      "detail": "4 milestone(s), all with tasks"
     }
   ],
   "global_commands": [],
   "passed": false,
-  "timestamp": "2026-03-03T19:18:31.557328"
+  "timestamp": "2026-03-03T21:00:55.938876"
 }

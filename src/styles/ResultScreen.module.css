@@ -1,1 +1,127 @@
-/* Стили ResultScreen (в папке styles) — будут добавлены в соответствующей задаче */
+/*
+ * Стили компонента ResultScreen.
+ * ADR-004: только CSS Modules, только переменные из global.css.
+ * Инвариант №15: хардкод цветов, размеров и шрифтов запрещён —
+ * используются исключительно CSS-переменные из :root в global.css.
+ */
+
+/* Внешний контейнер — центрирует карточку на экране */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background-color: var(--color-bg);
+}
+
+/* Карточка с результатом */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Текст результата (победа / ничья) */
+.resultText {
+  font-family: var(--font-family);
+  font-size: var(--font-size-large);
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Имя победителя — цвет задаётся динамически через inline-стиль (STYLE_EXCEPTION) */
+.winnerName {
+  font-weight: 700;
+}
+
+/* Контейнер кнопок — горизонтальное расположение (FR-10) */
+.actions {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Базовые стили кнопок */
+.buttonPrimary,
+.buttonSecondary {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  flex: 1;
+  transition: opacity 0.15s ease;
+}
+
+/* Primary-стиль: акцентный фон, светлый текст (FR-04) */
+.buttonPrimary {
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+}
+
+.buttonPrimary:hover {
+  opacity: 0.9;
+}
+
+.buttonPrimary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Secondary-стиль: прозрачный фон, рамка, тёмный текст (FR-05) */
+.buttonSecondary {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.buttonSecondary:hover {
+  opacity: 0.8;
+}
+
+.buttonSecondary:focus-visible {
+  outline: 2px solid var(--color-border);
+  outline-offset: 2px;
+}
+
+/* Адаптивная вёрстка: NFR-02 — корректное отображение от 320px */
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .resultText {
+    font-size: var(--font-size-base);
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .buttonPrimary,
+  .buttonSecondary {
+    width: 100%;
+    flex: none;
+  }
+}

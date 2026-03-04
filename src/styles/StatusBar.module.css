@@ -1,1 +1,41 @@
-/* Стили StatusBar (в папке styles) — будут добавлены в соответствующей задаче */
+/*
+ * Стили компонента StatusBar.
+ * ADR-004: только CSS Modules, только переменные из global.css.
+ * Инвариант №15: хардкод цветов запрещён — используются только CSS-переменные.
+ */
+
+.playerX {
+  color: var(--color-player-x);
+  font-family: var(--font-family);
+  font-size: var(--font-size-large);
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+.playerO {
+  color: var(--color-player-o);
+  font-family: var(--font-family);
+  font-size: var(--font-size-large);
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+.draw {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-large);
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+/* Адаптивная вёрстка: уменьшение шрифта на мобильных устройствах */
+@media (max-width: 480px) {
+  .playerX,
+  .playerO,
+  .draw {
+    font-size: var(--font-size-base);
+  }
+}

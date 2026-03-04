@@ -1,1 +1,6 @@
-/* Стили компонента ResultScreen — будут добавлены в соответствующей задаче */
+/*
+ * Этот файл намеренно оставлен пустым.
+ * Согласно архитектуре (ADR-004), стили компонента ResultScreen
+ * располагаются в src/styles/ResultScreen.module.css.
+ * ResultScreen.tsx импортирует стили из src/styles/ResultScreen.module.css.
+ */

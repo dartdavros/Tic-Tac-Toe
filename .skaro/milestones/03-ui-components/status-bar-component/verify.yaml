@@ -1,0 +1,7 @@
+- command: npx vitest run src/components/StatusBar.test.tsx --reporter=verbose
+  name: Smoke-тесты StatusBar
+- command: npx tsc --noEmit
+  name: Проверка типов TypeScript
+- command: npx eslint src/components/StatusBar.tsx src/components/StatusBar.test.tsx
+    src/styles/StatusBar.module.css
+  name: Линтинг изменённых файлов

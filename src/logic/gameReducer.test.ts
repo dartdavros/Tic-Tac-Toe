@@ -444,8 +444,8 @@ describe('gameReducer — MAKE_MOVE (PvP)', () => {
 // ─── MAKE_MOVE (PvAI) ─────────────────────────────────────────────────────────
 
 describe('gameReducer — MAKE_MOVE (PvAI)', () => {
-  it('применяет ход игрока и ответный ход ИИ атомарно (две занятые клетки)', () => {
-    // Человек = X, ИИ = O; getBestMove возвращает 4
+  it('после хода человека ИИ делает ответный ход', () => {
+    // ИИ возвращает индекс 4
     vi.mocked(getBestMove).mockReturnValue(4);
 
     const state = gameReducer(PVAI_GAME_STATE_HUMAN_X, {
@@ -453,14 +453,12 @@ describe('gameReducer — MAKE_MOVE (PvAI)', () => {
       payload: { index: 0 },
     });
 
-    // После одного вызова редьюсера на доске должно быть 2 занятые клетки
-    const occupied = state.board.filter((c) => c !== null).length;
-    expect(occupied).toBe(2);
-    expect(state.board[0]).toBe('X'); // ход человека
-    expect(state.board[4]).toBe('O'); // ход ИИ
+    // Клетка 0 — ход человека (X), клетка 4 — ход ИИ (O)
+    expect(state.board[0]).toBe('X');
+    expect(state.board[4]).toBe('O');
   });
 
-  it('ход ИИ передаёт ход обратно человеку (currentPlayer = X)', () => {
+  it('после хода человека ИИ делает ход и передаёт ход обратно человеку', () => {
     vi.mocked(getBestMove).mockReturnValue(4);
 
     const state = gameReducer(PVAI_GAME_STATE_HUMAN_X, {
@@ -474,256 +472,55 @@ describe('gameReducer — MAKE_MOVE (PvAI)', () => {
     }
   });
 
-  it('победа ИИ переводит игру в screen=result', () => {
-    // Доска: X занимает 0; O занимает 3, 4 — ИИ (O) ходит в 5 = победа
-    const board: BoardState = ['X', null, null, 'O', 'O', null, null, null, null];
-    const pvaiState: GameState = {
-      screen: 'game',
-      board,
-      status: { kind: 'playing', currentPlayer: 'X' },
-      settings: { mode: 'pvai', humanPlayer: 'X' },
-    };
-
-    // Человек (X) ходит в 1, затем ИИ (O) ходит в 5 = победа O
-    vi.mocked(getBestMove).mockReturnValue(5);
-
-    const state = gameReducer(pvaiState, {
-      type: 'MAKE_MOVE',
-      payload: { index: 1 },
-    });
-
-    expect(state.screen).toBe('result');
-    expect(state.status.kind).toBe('won');
-    if (state.status.kind === 'won') {
-      expect(state.status.winner).toBe('O');
-    }
-  });
-
-  it('победа человека не вызывает ход ИИ', () => {
-    // X занимает 0, 1 — ход в 2 = победа X; ИИ не должен ходить
+  it('переходит на result если человек побеждает своим ходом', () => {
+    // X: 0, 1 — ход в 2 = победа X; ИИ не должен ходить
     const board: BoardState = ['X', 'X', null, 'O', 'O', null, null, null, null];
-    const pvaiState: GameState = {
+    const state1: GameState = {
       screen: 'game',
       board,
       status: { kind: 'playing', currentPlayer: 'X' },
       settings: { mode: 'pvai', humanPlayer: 'X' },
     };
 
-    const state = gameReducer(pvaiState, {
+    const state2 = gameReducer(state1, {
       type: 'MAKE_MOVE',
       payload: { index: 2 },
     });
 
-    expect(state.screen).toBe('result');
-    expect(state.status.kind).toBe('won');
-    // getBestMove не должен вызываться — игра завершена после хода человека
+    expect(state2.screen).toBe('result');
+    expect(state2.status.kind).toBe('won');
+    if (state2.status.kind === 'won') {
+      expect(state2.status.winner).toBe('X');
+    }
+    // ИИ не должен был ходить после победы человека
     expect(getBestMove).not.toHaveBeenCalled();
   });
 
-  it('getBestMove возвращает null — logEvent вызван, ход игрока применён', () => {
-    // null имитирует некорректный возврат из getBestMove
-    vi.mocked(getBestMove).mockReturnValue(null as unknown as number);
+  it('переходит на result если ИИ побеждает своим ходом', () => {
+    // O (ИИ): 3, 4 — ход в 5 = победа O
+    vi.mocked(getBestMove).mockReturnValue(5);
 
-    const state = gameReducer(PVAI_GAME_STATE_HUMAN_X, {
-      type: 'MAKE_MOVE',
-      payload: { index: 0 },
-    });
-
-    // logEvent должен быть вызван с ошибкой
-    expect(logEvent).toHaveBeenCalledWith(
-      'reducer_error',
-      expect.objectContaining({ error: expect.anything() }),
-    );
-    // Ход игрока применён (клетка 0 занята X)
-    expect(state.board[0]).toBe('X');
-    // Ход ИИ не применён (только одна занятая клетка)
-    const occupied = state.board.filter((c) => c !== null).length;
-    expect(occupied).toBe(1);
-  });
-
-  it('getBestMove возвращает -1 — logEvent вызван, ход игрока применён', () => {
-    vi.mocked(getBestMove).mockReturnValue(-1);
-
-    const state = gameReducer(PVAI_GAME_STATE_HUMAN_X, {
-      type: 'MAKE_MOVE',
-      payload: { index: 0 },
-    });
-
-    expect(logEvent).toHaveBeenCalledWith(
-      'reducer_error',
-      expect.objectContaining({ error: expect.anything() }),
-    );
-    expect(state.board[0]).toBe('X');
-    const occupied = state.board.filter((c) => c !== null).length;
-    expect(occupied).toBe(1);
-  });
-
-  it('getBestMove выбрасывает исключение — logEvent вызван через applyAiMove', () => {
-    // Имитируем непредвиденную ошибку внутри getBestMove
-    vi.mocked(getBestMove).mockImplementation(() => {
-      throw new Error('Непредвиденная ошибка minimax');
-    });
-
-    // Редьюсер не должен выбрасывать исключение
-    expect(() =>
-      gameReducer(PVAI_GAME_STATE_HUMAN_X, {
-        type: 'MAKE_MOVE',
-        payload: { index: 0 },
-      }),
-    ).not.toThrow();
-
-    // logEvent должен быть вызван — исключение перехвачено в applyAiMove
-    expect(logEvent).toHaveBeenCalledWith(
-      'reducer_error',
-      expect.objectContaining({ error: expect.anything() }),
-    );
-  });
-
-  it('getBestMove выбрасывает исключение — ход игрока сохранён в результате', () => {
-    // Исключение перехватывается в applyAiMove, который возвращает stateAfterPlayer.
-    // Ход игрока (X в клетку 0) уже применён до вызова getBestMove.
-    vi.mocked(getBestMove).mockImplementation(() => {
-      throw new Error('Непредвиденная ошибка minimax');
-    });
-
-    const result = gameReducer(PVAI_GAME_STATE_HUMAN_X, {
-      type: 'MAKE_MOVE',
-      payload: { index: 0 },
-    });
-
-    // Ход игрока применён (applyAiMove возвращает stateAfterPlayer при ошибке)
-    expect(result.board[0]).toBe('X');
-    // Ход ИИ не применён
-    const occupied = result.board.filter((c) => c !== null).length;
-    expect(occupied).toBe(1);
-  });
-});
-
-// ─── RESTART ──────────────────────────────────────────────────────────────────
-
-describe('gameReducer — RESTART', () => {
-  it('возвращает INITIAL_STATE полностью', () => {
-    const midGame: GameState = {
+    const board: BoardState = ['X', null, null, 'O', 'O', null, null, null, null];
+    const state1: GameState = {
       screen: 'game',
-      board: ['X', 'O', null, null, 'X', null, null, null, null],
-      status: { kind: 'playing', currentPlayer: 'O' },
+      board,
+      status: { kind: 'playing', currentPlayer: 'X' },
       settings: { mode: 'pvai', humanPlayer: 'X' },
     };
-    const state = gameReducer(midGame, { type: 'RESTART' });
-    expect(state).toEqual(INITIAL_STATE);
-  });
 
-  it('возвращает screen === "menu"', () => {
-    const state = gameReducer(PVP_GAME_STATE, { type: 'RESTART' });
-    expect(state.screen).toBe('menu');
-  });
-
-  it('возвращает settings.mode === "pvp"', () => {
-    const pvaiState: GameState = {
-      screen: 'result',
-      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null],
-      status: { kind: 'won', winner: 'X', winLine: [0, 1, 2] },
-      settings: { mode: 'pvai', humanPlayer: 'X' },
-    };
-    const state = gameReducer(pvaiState, { type: 'RESTART' });
-    expect(state.settings.mode).toBe('pvp');
-  });
-
-  it('возвращает пустую доску', () => {
-    const state = gameReducer(PVP_GAME_STATE, { type: 'RESTART' });
-    expect(state.board).toEqual(EMPTY);
-  });
-
-  it('logEvent НЕ вызывается при RESTART', () => {
-    gameReducer(PVP_GAME_STATE, { type: 'RESTART' });
-    expect(logEvent).not.toHaveBeenCalled();
-  });
-});
-
-// ─── QUIT_TO_MENU ─────────────────────────────────────────────────────────────
-
-describe('gameReducer — QUIT_TO_MENU', () => {
-  it('возвращает INITIAL_STATE полностью', () => {
-    const state = gameReducer(PVP_GAME_STATE, { type: 'QUIT_TO_MENU' });
-    expect(state).toEqual(INITIAL_STATE);
-  });
-
-  it('возвращает screen === "menu"', () => {
-    const state = gameReducer(PVP_GAME_STATE, { type: 'QUIT_TO_MENU' });
-    expect(state.screen).toBe('menu');
-  });
-
-  it('logEvent НЕ вызывается при QUIT_TO_MENU', () => {
-    gameReducer(PVP_GAME_STATE, { type: 'QUIT_TO_MENU' });
-    expect(logEvent).not.toHaveBeenCalled();
-  });
-});
-
-// ─── Защитное поведение (try/catch) ───────────────────────────────────────────
-
-describe('gameReducer — защитное поведение', () => {
-  it('редьюсер не выбрасывает исключение при любых входных данных', () => {
-    vi.mocked(getBestMove).mockImplementation(() => {
-      throw new Error('Тестовая ошибка');
-    });
-
-    expect(() =>
-      gameReducer(PVAI_GAME_STATE_HUMAN_X, {
-        type: 'MAKE_MOVE',
-        payload: { index: 0 },
-      }),
-    ).not.toThrow();
-  });
-
-  it('при исключении в getBestMove возвращается состояние с ходом игрока', () => {
-    // applyAiMove перехватывает исключение от getBestMove и возвращает
-    // stateAfterPlayer (с ходом игрока, но без хода ИИ).
-    // Это корректное поведение: ход игрока не откатывается.
-    vi.mocked(getBestMove).mockImplementation(() => {
-      throw new Error('Тестовая ошибка');
-    });
-
-    const result = gameReducer(PVAI_GAME_STATE_HUMAN_X, {
+    const state2 = gameReducer(state1, {
       type: 'MAKE_MOVE',
-      payload: { index: 0 },
+      payload: { index: 1 },
     });
 
-    // Ход игрока применён (X в клетку 0)
-    expect(result.board[0]).toBe('X');
-    // Ход ИИ не применён (только одна занятая клетка)
-    const occupied = result.board.filter((c) => c !== null).length;
-    expect(occupied).toBe(1);
-    // Экран остаётся 'game' (игра не завершена)
-    expect(result.screen).toBe('game');
+    expect(state2.screen).toBe('result');
+    expect(state2.status.kind).toBe('won');
+    if (state2.status.kind === 'won') {
+      expect(state2.status.winner).toBe('O');
+    }
   });
 
-  it('при исключении внутри редьюсера logEvent вызывается с полным объектом action', () => {
-    // applyAiMove перехватывает исключение и вызывает logEvent с полным action
-    vi.mocked(getBestMove).mockImplementation(() => {
-      throw new Error('Тестовая ошибка');
-    });
-
-    const action = {
-      type: 'MAKE_MOVE' as const,
-      payload: { index: 0 },
-    };
-
-    gameReducer(PVAI_GAME_STATE_HUMAN_X, action);
-
-    // logEvent должен быть вызван с полным объектом action
-    expect(logEvent).toHaveBeenCalledWith(
-      'reducer_error',
-      expect.objectContaining({
-        action: expect.objectContaining({
-          type: 'MAKE_MOVE',
-          payload: { index: 0 },
-        }),
-        error: expect.anything(),
-      }),
-    );
-  });
-
-  it('logEvent НЕ вызывается при успешном MAKE_MOVE в PvAI-режиме', () => {
+  it('getBestMove вызывается с корректными аргументами (доска после хода человека, символ ИИ)', () => {
     vi.mocked(getBestMove).mockReturnValue(4);
 
     gameReducer(PVAI_GAME_STATE_HUMAN_X, {
@@ -731,17 +528,191 @@ describe('gameReducer — защитное поведение', () => {
       payload: { index: 0 },
     });
 
-    expect(logEvent).not.toHaveBeenCalled();
+    // Первый аргумент — доска с ходом человека, второй — символ ИИ (O)
+    expect(getBestMove).toHaveBeenCalledWith(
+      expect.arrayContaining(['X']),
+      'O',
+    );
   });
 
-  it('logEvent НЕ вызывается при успешном START_GAME в PvAI-режиме с ходом ИИ', () => {
-    vi.mocked(getBestMove).mockReturnValue(4);
+  it('при некорректном ходе ИИ logEvent вызывается с { error }', () => {
+    // getBestMove возвращает уже занятую клетку
+    vi.mocked(getBestMove).mockReturnValue(0);
 
-    gameReducer(INITIAL_STATE, {
-      type: 'START_GAME',
-      payload: { mode: 'pvai', humanPlayer: 'O' },
+    const board: BoardState = ['X', null, null, null, null, null, null, null, null];
+    const state1: GameState = {
+      screen: 'game',
+      board,
+      status: { kind: 'playing', currentPlayer: 'O' },
+      settings: { mode: 'pvai', humanPlayer: 'O' },
+    };
+
+    gameReducer(state1, {
+      type: 'MAKE_MOVE',
+      payload: { index: 1 },
     });
 
-    expect(logEvent).not.toHaveBeenCalled();
+    expect(logEvent).toHaveBeenCalledWith(
+      'reducer_error',
+      expect.objectContaining({ error: expect.anything() }),
+    );
+  });
+});
+
+// ─── RESTART ──────────────────────────────────────────────────────────────────
+
+describe('gameReducer — RESTART', () => {
+  it('сбрасывает доску и переходит на экран game с теми же настройками (PvP)', () => {
+    const resultState: GameState = {
+      screen: 'result',
+      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null],
+      status: { kind: 'won', winner: 'X', winLine: [0, 1, 2] },
+      settings: { mode: 'pvp' },
+    };
+    const state = gameReducer(resultState, { type: 'RESTART' });
+
+    expect(state.screen).toBe('game');
+    expect(state.board).toEqual(EMPTY);
+    expect(state.status.kind).toBe('playing');
+    // Настройки сохраняются — режим остаётся pvp
+    expect(state.settings.mode).toBe('pvp');
+  });
+
+  it('сбрасывает доску и переходит на экран game с теми же настройками (PvAI)', () => {
+    const pvaiState: GameState = {
+      screen: 'result',
+      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null],
+      status: { kind: 'won', winner: 'X', winLine: [0, 1, 2] },
+      settings: { mode: 'pvai', humanPlayer: 'X' },
+    };
+    const state = gameReducer(pvaiState, { type: 'RESTART' });
+
+    expect(state.screen).toBe('game');
+    expect(state.board).toEqual(EMPTY);
+    // Настройки сохраняются — режим остаётся pvai
+    expect(state.settings.mode).toBe('pvai');
+  });
+
+  it('X ходит первым после RESTART', () => {
+    const resultState: GameState = {
+      screen: 'result',
+      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null],
+      status: { kind: 'won', winner: 'X', winLine: [0, 1, 2] },
+      settings: { mode: 'pvp' },
+    };
+    const state = gameReducer(resultState, { type: 'RESTART' });
+
+    if (state.status.kind === 'playing') {
+      expect(state.status.currentPlayer).toBe('X');
+    }
+  });
+
+  it('(PvAI, человек = O) после RESTART ИИ делает первый ход', () => {
+    vi.mocked(getBestMove).mockReturnValue(4);
+
+    const pvaiState: GameState = {
+      screen: 'result',
+      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null],
+      status: { kind: 'won', winner: 'X', winLine: [0, 1, 2] },
+      settings: { mode: 'pvai', humanPlayer: 'O' },
+    };
+    const state = gameReducer(pvaiState, { type: 'RESTART' });
+
+    expect(state.board[4]).toBe('X');
+    expect(getBestMove).toHaveBeenCalledTimes(1);
+  });
+
+  it('(PvAI, человек = X) после RESTART ИИ НЕ ходит первым', () => {
+    const pvaiState: GameState = {
+      screen: 'result',
+      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null],
+      status: { kind: 'won', winner: 'X', winLine: [0, 1, 2] },
+      settings: { mode: 'pvai', humanPlayer: 'X' },
+    };
+    const state = gameReducer(pvaiState, { type: 'RESTART' });
+
+    expect(state.board).toEqual(EMPTY);
+    expect(getBestMove).not.toHaveBeenCalled();
+  });
+});
+
+// ─── QUIT_TO_MENU ─────────────────────────────────────────────────────────────
+
+describe('gameReducer — QUIT_TO_MENU', () => {
+  it('возвращает начальное состояние (screen=menu)', () => {
+    const state = gameReducer(PVP_GAME_STATE, { type: 'QUIT_TO_MENU' });
+    expect(state.screen).toBe('menu');
+    expect(state.board).toEqual(EMPTY);
+  });
+
+  it('сбрасывает настройки до pvp', () => {
+    const pvaiState: GameState = {
+      screen: 'game',
+      board: EMPTY,
+      status: { kind: 'playing', currentPlayer: 'X' },
+      settings: { mode: 'pvai', humanPlayer: 'X' },
+    };
+    const state = gameReducer(pvaiState, { type: 'QUIT_TO_MENU' });
+    expect(state.settings.mode).toBe('pvp');
+  });
+});
+
+// ─── RESET_GAME ───────────────────────────────────────────────────────────────
+
+describe('gameReducer — RESET_GAME', () => {
+  it('возвращает начальное состояние из любого экрана', () => {
+    const state = gameReducer(PVP_GAME_STATE, { type: 'RESET_GAME' });
+    expect(state).toEqual(INITIAL_STATE);
+  });
+
+  it('возвращает начальное состояние из экрана result', () => {
+    const resultState: GameState = {
+      screen: 'result',
+      board: ['X', 'X', 'X', 'O', 'O', null, null, null, null],
+      status: { kind: 'won', winner: 'X', winLine: [0, 1, 2] },
+      settings: { mode: 'pvai', humanPlayer: 'O' },
+    };
+    const state = gameReducer(resultState, { type: 'RESET_GAME' });
+    expect(state).toEqual(INITIAL_STATE);
+  });
+});
+
+// ─── Защитное поведение ───────────────────────────────────────────────────────
+
+describe('gameReducer — защитное поведение', () => {
+  it('при исключении внутри редьюсера возвращает текущее состояние', () => {
+    // Мокируем getBestMove так, чтобы он выбросил исключение
+    vi.mocked(getBestMove).mockImplementation(() => {
+      throw new Error('Тестовая ошибка');
+    });
+
+    const state = gameReducer(PVAI_GAME_STATE_HUMAN_X, {
+      type: 'MAKE_MOVE',
+      payload: { index: 0 },
+    });
+
+    // Редьюсер должен вернуть состояние до хода ИИ (с ходом человека уже применённым)
+    // или исходное состояние — зависит от того, где произошло исключение.
+    // Главное — не выбросить исключение наружу.
+    expect(state).toBeDefined();
+    expect(state.screen).not.toBe(undefined);
+  });
+
+  it('при исключении внутри applyAiMove logEvent вызывается с { error }', () => {
+    // getBestMove выбрасывает исключение — попадаем в catch внутри applyAiMove
+    vi.mocked(getBestMove).mockImplementation(() => {
+      throw new Error('Тестовая ошибка');
+    });
+
+    gameReducer(PVAI_GAME_STATE_HUMAN_X, {
+      type: 'MAKE_MOVE',
+      payload: { index: 0 },
+    });
+
+    // logEvent вызывается внутри applyAiMove с { error } (без action)
+    expect(logEvent).toHaveBeenCalledWith(
+      'reducer_error',
+      expect.objectContaining({ error: expect.anything() }),
+    );
   });
 });

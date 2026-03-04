@@ -1,0 +1,9 @@
+- command: npx vitest run src/components/ResultScreen.test.tsx --reporter=verbose
+  name: Smoke-тесты ResultScreen
+- command: npx eslint src/components/ResultScreen.tsx src/components/ResultScreen.test.tsx
+    src/styles/ResultScreen.module.css --max-warnings=0
+  name: Линтинг изменённых файлов
+- command: npx tsc --noEmit --project tsconfig.app.json
+  name: Проверка типов
+- command: npx vitest run --reporter=verbose
+  name: Полный прогон тестов (регрессия)
