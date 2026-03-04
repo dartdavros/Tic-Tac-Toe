@@ -1,0 +1,33 @@
+- command: npm run build
+  name: Сборка проекта
+- command: npx tsc --noEmit
+  name: Проверка типов TypeScript
+- command: npx eslint src/main.tsx src/styles/global.css --max-warnings 0
+  name: Линтинг ESLint
+- command: 'test -f index.html && test -f src/main.tsx && test -f src/styles/global.css
+    && test -f public/favicon.svg && echo "Все обязательные файлы присутствуют"
+
+    '
+  name: Проверка наличия обязательных файлов
+- command: 'grep -q ''lang="ru"'' index.html && grep -q ''name="viewport"'' index.html
+    && grep -q ''Крестики-нолики'' index.html && grep -q ''favicon.svg'' index.html
+    && grep -q ''id="root"'' index.html && echo "index.html содержит все обязательные
+    элементы"
+
+    '
+  name: Проверка содержимого index.html
+- command: 'grep -q ''Элемент #root не найден'' src/main.tsx && grep -q ''StrictMode''
+    src/main.tsx && grep -q ''ErrorBoundary'' src/main.tsx && grep -q ''global.css''
+    src/main.tsx && echo "main.tsx содержит все обязательные элементы"
+
+    '
+  name: Проверка содержимого main.tsx
+- command: 'grep -q ''box-sizing: border-box'' src/styles/global.css && grep -q ''margin:
+    0'' src/styles/global.css && grep -q ''padding: 0'' src/styles/global.css && grep
+    -q ''--color-player-x'' src/styles/global.css && grep -q ''--color-player-o''
+    src/styles/global.css && echo "global.css содержит CSS-сброс и токены дизайна"
+
+    '
+  name: Проверка CSS-сброса в global.css
+- command: npx vitest run src/components/App.test.tsx
+  name: Запуск тестов (smoke)

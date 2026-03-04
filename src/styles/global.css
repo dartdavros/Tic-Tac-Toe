@@ -1,7 +1,30 @@
+/*
+ * Глобальные стили приложения.
+ * ADR-004: только сброс, шрифты и CSS-переменные (токены дизайна).
+ * Инвариант №15: все токены дизайна определяются здесь и только здесь.
+ * Компонентные стили — исключительно в *.module.css.
+ */
+
+/* ─── CSS-сброс (FR-10) ──────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Токены дизайна (CSS-переменные) ───────────────────────────────────── */
+
 :root {
   /* Цвета игроков */
   --color-player-x: #e74c3c;
   --color-player-o: #3498db;
+
+  /* Псевдонимы для ResultScreen (STYLE_EXCEPTION: динамический цвет победителя) */
+  --color-x: #e74c3c;
+  --color-o: #3498db;
 
   /* Цвета интерфейса */
   --color-bg: #f9f9f9;
@@ -10,9 +33,6 @@
   --color-text-primary: #222222;
   --color-text-secondary: #666666;
   --color-accent: #27ae60;
-
-  /* Цвет подсветки победной линии (FR-05, FR-07) */
-  --color-win-highlight: #f1c40f;
 
   /* Размеры клетки */
   --cell-size-mobile: 80px;
@@ -24,17 +44,28 @@
   --font-size-large: 24px;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ─── Базовые стили ──────────────────────────────────────────────────────── */
 
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   background-color: var(--color-bg);
   color: var(--color-text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Кнопки наследуют шрифт от body (браузерный сброс) */
+button {
+  font-family: inherit;
+}
+
+/* ─── Адаптивная типографика (NFR-02: от 320px) ─────────────────────────── */
+
+@media (max-width: 480px) {
+  :root {
+    --font-size-large: 20px;
+    --cell-size-desktop: var(--cell-size-mobile);
+  }
 }

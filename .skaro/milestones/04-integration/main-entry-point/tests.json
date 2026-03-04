@@ -1,0 +1,96 @@
+{
+  "checklist": [
+    {
+      "id": "planned_files",
+      "label": "Files from plan exist",
+      "passed": true,
+      "detail": "9/9 files found"
+    },
+    {
+      "id": "test_files_exist",
+      "label": "Test files present",
+      "passed": true,
+      "detail": "10 test file(s) found"
+    },
+    {
+      "id": "spec_exists",
+      "label": "Specification filled",
+      "passed": true,
+      "detail": "3686 chars"
+    },
+    {
+      "id": "stages_complete",
+      "label": "All stages implemented",
+      "passed": true,
+      "detail": "1/1 stages"
+    }
+  ],
+  "task_commands": [
+    {
+      "name": "Сборка проекта",
+      "command": "npm run build",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "\n> tic-tac-toe@0.1.0 build\n> tsc -b && vite build\n\n\u001b[36mvite v5.4.11 \u001b[32mbuilding for production...\u001b[36m\u001b[39m\ntransforming...\n\u001b[32m✓\u001b[39m 52 modules transformed.\nrendering chunks...\ncomputing gzip size...\n\u001b[2mdist/\u001b[22m\u001b[32mindex.html                 \u001b[39m\u001b[1m\u001b[2m  0.48 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  0.34 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[35massets/index-Yh9_XHXc.css  \u001b[39m\u001b[1m\u001b[2m  7.46 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip:  1.57 kB\u001b[22m\n\u001b[2mdist/\u001b[22m\u001b[36massets/index-DVAyUgYI.js   \u001b[39m\u001b[1m\u001b[2m151.47 kB\u001b[22m\u001b[1m\u001b[22m\u001b[2m │ gzip: 49.13 kB\u001b[22m\n\u001b[32m✓ built in 649ms\u001b[39m\n",
+      "stderr": ""
+    },
+    {
+      "name": "Проверка типов TypeScript",
+      "command": "npx tsc --noEmit",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "Линтинг ESLint",
+      "command": "npx eslint src/main.tsx src/styles/global.css --max-warnings 0",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "\nC:\\Users\\drmar\\MyProjects\\test-projects\\Tic-Tac-Toe\\src\\styles\\global.css\n  0:0  warning  File ignored because no matching configuration was supplied\n\n✖ 1 problem (0 errors, 1 warning)\n\n",
+      "stderr": "ESLint found too many warnings (maximum: 0).\n"
+    },
+    {
+      "name": "Проверка наличия обязательных файлов",
+      "command": "test -f index.html && test -f src/main.tsx && test -f src/styles/global.css && test -f public/favicon.svg && echo \"Все обязательные файлы присутствуют\"\n",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "\"test\" �� ���� ����७��� ��� ���譥�\r\n��������, �ᯮ��塞�� �ணࠬ��� ��� ������ 䠩���.\r\n"
+    },
+    {
+      "name": "Проверка содержимого index.html",
+      "command": "grep -q 'lang=\"ru\"' index.html && grep -q 'name=\"viewport\"' index.html && grep -q 'Крестики-нолики' index.html && grep -q 'favicon.svg' index.html && grep -q 'id=\"root\"' index.html && echo \"index.html содержит все обязательные элементы\"\n",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "\"grep\" �� ���� ����७��� ��� ���譥�\r\n��������, �ᯮ��塞�� �ணࠬ��� ��� ������ 䠩���.\r\n"
+    },
+    {
+      "name": "Проверка содержимого main.tsx",
+      "command": "grep -q 'Элемент #root не найден' src/main.tsx && grep -q 'StrictMode' src/main.tsx && grep -q 'ErrorBoundary' src/main.tsx && grep -q 'global.css' src/main.tsx && echo \"main.tsx содержит все обязательные элементы\"\n",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "\"grep\" �� ���� ����७��� ��� ���譥�\r\n��������, �ᯮ��塞�� �ணࠬ��� ��� ������ 䠩���.\r\n"
+    },
+    {
+      "name": "Проверка CSS-сброса в global.css",
+      "command": "grep -q 'box-sizing: border-box' src/styles/global.css && grep -q 'margin: 0' src/styles/global.css && grep -q 'padding: 0' src/styles/global.css && grep -q '--color-player-x' src/styles/global.css && grep -q '--color-player-o' src/styles/global.css && echo \"global.css содержит CSS-сброс и токены дизайна\"\n",
+      "success": false,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "\"grep\" �� ���� ����७��� ��� ���譥�\r\n��������, �ᯮ��塞�� �ணࠬ��� ��� ������ 䠩���.\r\n"
+    },
+    {
+      "name": "Запуск тестов (smoke)",
+      "command": "npx vitest run src/components/App.test.tsx",
+      "success": true,
+      "exit_code": 0,
+      "stdout": "\n\u001b[1m\u001b[7m\u001b[36m RUN \u001b[39m\u001b[27m\u001b[22m \u001b[36mv2.1.8 \u001b[39m\u001b[90mC:/Users/drmar/MyProjects/test-projects/Tic-Tac-Toe\u001b[39m\n\n \u001b[32m✓\u001b[39m src/components/App.test.tsx \u001b[2m(\u001b[22m\u001b[2m5 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[90m 89\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m5 passed\u001b[39m\u001b[22m\u001b[90m (5)\u001b[39m\n\u001b[2m   Start at \u001b[22m 22:17:16\n\u001b[2m   Duration \u001b[22m 1.61s\u001b[2m (transform 164ms, setup 128ms, collect 389ms, tests 89ms, environment 612ms, prepare 113ms)\u001b[22m\n\n",
+      "stderr": ""
+    }
+  ],
+  "passed": false,
+  "timestamp": "2026-03-04T22:17:18.166637"
+}

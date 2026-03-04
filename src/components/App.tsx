@@ -7,6 +7,7 @@ import { Board } from './Board';
 import { StatusBar } from './StatusBar';
 import { ResultScreen } from './ResultScreen';
 import type { GameSettings as GameSettingsType } from '../types';
+import type { ResultStatus } from './ResultScreen';
 import styles from '../styles/App.module.css';
 
 /**
@@ -58,6 +59,14 @@ export function App() {
   // FR-11: Board заблокирован при завершённой партии
   const isBoardDisabled = state.status.kind !== 'playing';
 
+  // Сужение типа для ResultScreen: экран 'result' достижим только при won/draw (инвариант №11).
+  // Приведение через type guard безопасно: редьюсер переходит на 'result' только
+  // внутри обработки MAKE_MOVE после checkWinner/isBoardFull (ADR-003, инвариант №5).
+  const resultStatus =
+    state.screen === 'result'
+      ? (state.status as ResultStatus)
+      : null;
+
   return (
     <ErrorBoundary
       key={resetKey}
@@ -73,7 +82,8 @@ export function App() {
         {/* FR-03: игровой экран */}
         {state.screen === 'game' && (
           <div className={styles.gameScreen}>
-            <StatusBar status={state.status} settings={state.settings} />
+            {/* StatusBar принимает только status — settings не нужен (FR-03) */}
+            <StatusBar status={state.status} />
             {/* FR-15: Board получает ровно 4 пропа */}
             <Board
               board={state.board}
@@ -84,10 +94,10 @@ export function App() {
           </div>
         )}
 
-        {/* FR-04: экран результата */}
-        {state.screen === 'result' && (
+        {/* FR-04: экран результата — рендерится только при resultStatus !== null */}
+        {state.screen === 'result' && resultStatus !== null && (
           <ResultScreen
-            status={state.status}
+            status={resultStatus}
             onRestart={handleRestart}
             onQuitToMenu={handleQuitToMenu}
           />
